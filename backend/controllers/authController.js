@@ -67,8 +67,13 @@ const login = async (req, res) => {
   }
 };
 
+//logout
 const logout = (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true, // Required for HTTPS (Use false in development)
+    sameSite: "None", // Required for cross-origin cookies
+  });
   res.json({ message: "Logged out successfully" });
 };
 

@@ -15,9 +15,15 @@ connectDB();
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const io = new Server(server, { cors: { origin: "http://localhost:5173" } });
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Frontend URL
+    credentials: true, // Allow cookies & authentication headers
+  })
+);
+
 app.use(cookieParser());
 app.use(express.json());
 
