@@ -3,12 +3,14 @@ import { BiMenu } from "react-icons/bi";
 import { CiSearch } from "react-icons/ci";
 import { IoChatboxEllipses } from "react-icons/io5";
 import API from "../api/axiosInstance";
+import { toast } from "react-toastify";
 
 const LeftSidebar = ({ setSelectedUser }) => {
   const [users, setUsers] = useState([]);
 
   console.log("users in leftsidebar", users);
 
+  //get users for letfsidebar
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -22,23 +24,32 @@ const LeftSidebar = ({ setSelectedUser }) => {
     fetchUsers();
   }, []);
 
+  //profile
+  const handleProfile = () => {
+    window.location.href = "/profile";
+  };
+
   //logouot
   const handleLogout = async () => {
     try {
       await API.post("/auth/logout");
-      window.location.href = "/"; // Redirect to login page
+      toast.success("Logged out successfully");
+      setTimeout(() => {
+        window.location.href = "/"; // Redirect to login page
+      }, 800);
     } catch (err) {
       console.error("Error logging out:", err);
+      toast.error("Failed to log out");
     }
   };
 
   return (
-    <div className="bg-green-700 text-white h-[80vh] w-[300px]  shadow-lg rounded-lg overflow-hidden">
+    <div className="bg-gray-700 text-white h-[80vh] w-[300px]  shadow-lg rounded-lg overflow-hidden">
       {/* Header Section */}
       <div className="p-4 flex justify-between items-center border-b border-green-500">
         <div className="flex items-center gap-2">
           <IoChatboxEllipses className="text-2xl" />
-          <span className="text-lg font-semibold">ChatApp</span>
+          <span className="text-lg font-semibold">SYNCTALK</span>
         </div>
 
         <div className="relative">
@@ -48,8 +59,11 @@ const LeftSidebar = ({ setSelectedUser }) => {
 
             {/* 🔹 Dropdown Menu (Visible on Hover) */}
             <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-              <p className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer">
-                Edit Profile
+              <p
+                onClick={handleProfile}
+                className="px-4 py-2 text-gray-700 hover:bg-green-500 rounded-md cursor-pointer"
+              >
+                👤Profile
               </p>
               <hr className="border-gray-200 my-1" />
               <p
@@ -64,12 +78,12 @@ const LeftSidebar = ({ setSelectedUser }) => {
       </div>
 
       {/* Search Bar */}
-      <div className="p-3 flex items-center gap-2 bg-green-800">
+      <div className="p-3 flex items-center gap-2">
         <CiSearch className="text-xl text-gray-300" />
         <input
           type="text"
           placeholder="Search here..."
-          className="bg-transparent border border-gray-400 rounded-md px-3 py-1 text-white w-full focus:outline-none focus:ring-2 focus:ring-green-400"
+          className="bg-transparent border border-gray-400 rounded-md px-3 py-1 text-white w-full focus:outline-none focus:ring-2 focus:ring-white-400"
         />
       </div>
 

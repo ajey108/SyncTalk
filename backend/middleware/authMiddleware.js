@@ -1,22 +1,32 @@
 import jwt from "jsonwebtoken";
+import User from "../models/user.js";
 
-const authMiddleware = (req, res, next) => {
-  const token = req.cookies.token; //  Read token from cookies
-  console.log("token is", token);
-
-  if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Access denied. No token provided." });
-  }
-
+const authMiddleware = async (req, res, next) => {
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("verified token is", verified);
-    req.user = verified; //  Attach user data to the request
+    const token = req.cookies.token; // 👈 Fetch token from cookies
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ error: "Access denied. No token provided." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded Token:", decoded); // Debugging Step
+
+    const user = await User.findById(decoded.userId); // 👈 Fetch full user from DB
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    req.user = user; // ✅ Attach full user object to req.user
+    console.log("User attached to request:", req.user); // Debugging Step
+
     next();
-  } catch (err) {
-    res.status(400).json({ message: "Invalid token" });
+  } catch (error) {
+    console.error("Auth Middleware Error:", error);
+    res.status(401).json({ error: "Invalid or expired token" });
   }
 };
 

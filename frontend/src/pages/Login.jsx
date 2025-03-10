@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { IoLogoWechat } from "react-icons/io5";
 import API from "../api/axiosInstance";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Sign up");
@@ -28,17 +29,21 @@ const Login = () => {
         await API.post(`/auth/register`, formData, {
           withCredentials: true, // Enable cookies
         });
-        alert("Account created successfully! Please log in.");
+
+        toast("Account created successfully! Please log in.");
         setCurrentState("Login");
       } else {
         await API.post(`/auth/login`, formData, {
           withCredentials: true, // Enable cookies
         });
-        alert("Login successful! You are now authenticated.");
-        window.location.href = "/chat"; // Redirect to chat page
+        toast.success("Login successful! 🎉");
+        setTimeout(() => {
+          window.location.href = "/chat";
+        }, 2000); // Wait 2 seconds before redirecting
       }
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong!");
+      toast("something went wrong");
     }
 
     setLoading(false);
@@ -47,7 +52,7 @@ const Login = () => {
   return (
     <div
       className="min-h-screen bg-cover bg-center flex items-center justify-center px-6"
-      style={{ backgroundImage: "url('/chatimage.jpeg')" }}
+      style={{ backgroundImage: "url('/Homelogo.png')" }}
     >
       {/* Left Side Icon */}
       <div className="hidden md:flex flex-col items-center mr-10">

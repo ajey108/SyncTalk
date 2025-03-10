@@ -1,70 +1,132 @@
 import React, { useState } from "react";
-import { RxAvatar } from "react-icons/rx";
-import { IoMdChatboxes } from "react-icons/io";
+import API from "../api/axiosInstance";
+import { useAuth } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 const ProfileUpdate = () => {
+  const { user, setUser } = useAuth();
   const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false); // State for loader
+
+  const [formData, setFormData] = useState({
+    username: "",
+    status: "",
+  });
+
+  console.log("User data:", user);
+
+  // Handle image selection
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file)); // Generate preview URL
+    }
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true); // Show loader
+
+    const data = new FormData();
+    data.append("username", formData.username);
+    data.append("status", formData.status);
+    if (image) {
+      data.append("profilePic", image);
+    }
+
+    try {
+      const response = await API.put("/users/update", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (response.status === 200) {
+        console.log("Updated User from API:", response.data);
+        setUser(response.data); // Update user in context
+        toast.success("Profile updated successfully!");
+
+        setTimeout(() => {
+          window.location.href = "/chat";
+        }, 600);
+      } else {
+        toast.error("Failed to update profile");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update profile");
+    } finally {
+      setLoading(false); // Hide loader
+    }
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-200">
-      <div className="bg-white shadow-lg rounded-lg p-6 w-96">
-        <form className="flex flex-col gap-4">
-          <h3 className="text-xl font-semibold text-gray-800 text-center">
-            Profile Details
-          </h3>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
+      <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
+        <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
+          Update Profile
+        </h1>
 
-          {/* Upload Avatar */}
-          <label
-            htmlFor="avatar"
-            className="cursor-pointer flex flex-col items-center justify-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-500 transition"
-          >
-            {image ? (
-              <img
-                src={URL.createObjectURL(image)}
-                alt="Profile"
-                className="w-24 h-24 rounded-full object-cover"
-              />
-            ) : (
-              <RxAvatar className="text-4xl text-gray-500" />
-            )}
-            <span className="text-sm text-gray-600">Upload Profile Image</span>
-            <input
-              onChange={(e) => setImage(e.target.files[0])}
-              type="file"
-              id="avatar"
-              accept=".png,.jpg,.jpeg"
-              hidden
-            />
-          </label>
-
-          {/* Name Input */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {/* Username Input */}
           <input
             type="text"
-            placeholder="Your Name"
+            placeholder="Username"
+            value={formData.username}
+            onChange={(e) =>
+              setFormData({ ...formData, username: e.target.value })
+            }
             required
-            className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
 
-          {/* Bio Input */}
+          {/* Status Textarea */}
           <textarea
-            placeholder="Your Bio"
+            placeholder="Status"
+            value={formData.status}
+            onChange={(e) =>
+              setFormData({ ...formData, status: e.target.value })
+            }
             required
-            className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          ></textarea>
+            className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none h-24"
+          />
 
-          {/* Save Button */}
+          {/* Image Preview */}
+          {preview && (
+            <div className="flex justify-center">
+              <img
+                src={preview}
+                alt="Profile Preview"
+                className="w-24 h-24 rounded-full object-cover border border-gray-300"
+              />
+            </div>
+          )}
+
+          {/* File Upload */}
+          <label className="flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg p-3 cursor-pointer hover:border-blue-500 transition">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+            <span className="text-gray-500">📷 Upload Profile Picture</span>
+          </label>
+
+          {/* Submit Button with Loader */}
           <button
+            className="bg-blue-600 text-white font-semibold p-3 rounded-lg hover:bg-blue-700 transition-all duration-300 flex items-center justify-center"
             type="submit"
-            className="bg-blue-600 text-white font-semibold p-2 rounded-lg hover:bg-blue-700 transition"
+            disabled={loading}
           >
-            Save
+            {loading ? (
+              <div className="animate-spin border-t-2 border-white border-solid rounded-full w-5 h-5"></div>
+            ) : (
+              "Save Changes"
+            )}
           </button>
         </form>
-
-        {/* Chat Icon */}
-        <div className="mt-4 flex justify-center">
-          <IoMdChatboxes className="text-3xl text-blue-500 cursor-pointer hover:text-blue-700 transition" />
-        </div>
       </div>
     </div>
   );

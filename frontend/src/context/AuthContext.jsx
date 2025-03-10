@@ -23,8 +23,18 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
+  // refresh user data (for updates)
+  const updateUser = async () => {
+    try {
+      const res = await API.get("/users/me", { withCredentials: true });
+      setUser(res.data); // Update user state
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, setUser, loading }}>
+    <AuthContext.Provider value={{ user, setUser, loading, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

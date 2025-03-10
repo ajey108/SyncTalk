@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { GoDotFill } from "react-icons/go";
 import { useAuth } from "../context/AuthContext";
 
 const RightSidebar = () => {
-  const { user, loading } = useAuth();
-  console.log("user in rightsidebar", user);
+  const { user, loading, updateUser } = useAuth();
+
+  // Call updateUser() when user updates profile
+  useEffect(() => {
+    updateUser();
+  }, []);
   if (loading) return <p>Loading...</p>;
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 w-72">
+    <div className="bg-white shadow-lg h-[80vh] rounded-lg p-6 w-72">
       {/* 🔹 Profile Section */}
       <div className="flex items-center gap-3 mb-4">
         <img
@@ -22,7 +26,7 @@ const RightSidebar = () => {
           </p>
         </div>
       </div>
-      <p className="text-gray-600 mb-4">Hi there, what's up?</p>
+      <p className="text-gray-600 mb-4">{user.status || "hey there"}</p>
 
       <hr className="mb-4 opacity-50" />
 

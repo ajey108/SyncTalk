@@ -4,21 +4,16 @@ import cloudinary from "../config/cloudinary.js";
 const sendMessage = async (req, res) => {
   try {
     const { sender, receiver, text, image } = req.body;
-    console.log(req.body.receiver); // Check the receiver value
+    console.log(
+      "sender, receiver, text, image:",
+      sender,
+      receiver,
+      text,
+      image
+    );
 
-    let imageUrl = "";
-
-    // If there is an image, upload it to Cloudinary
-    if (image) {
-      const uploadedResponse = await cloudinary.uploader.upload(image, {
-        folder: "chat-app/messages",
-        transformation: [{ width: 500, height: 500, crop: "limit" }],
-      });
-
-      imageUrl = uploadedResponse.secure_url; // Get the Cloudinary image URL
-    }
-
-    const message = new Message({ sender, receiver, text, image: imageUrl });
+    // Save message with already uploaded image URL
+    const message = new Message({ sender, receiver, text, image });
     await message.save();
 
     res.status(201).json(message);
@@ -29,16 +24,22 @@ const sendMessage = async (req, res) => {
 
 const getMessages = async (req, res) => {
   try {
-    const { sender, receiver } = req.query;
+    const { senderId, receiverId } = req.params; // ✅ Extract sender & receiver from params
+
+    if (!senderId || !receiverId) {
+      return res.status(400).json({ error: "Missing sender or receiver ID" });
+    }
+
+    console.log("Sender:", senderId, "Receiver:", receiverId); // Debugging
 
     const messages = await Message.find({
       $or: [
-        { sender, receiver }, // Messages sent by the sender
-        { sender: receiver, receiver: sender }, // Messages received by the sender
+        { sender: senderId, receiver: receiverId },
+        { sender: receiverId, receiver: senderId },
       ],
     })
-      .sort({ createdAt: 1 }) // Sort messages in order
-      .select("sender receiver text image createdAt"); // Only fetch required fields
+      .sort({ createdAt: 1 })
+      .select("sender receiver text image createdAt");
 
     res.json(messages);
   } catch (err) {
