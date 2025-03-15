@@ -52,7 +52,7 @@ const Login = () => {
   return (
     <div
       className="min-h-screen bg-cover bg-center flex items-center justify-center px-6"
-      style={{ backgroundImage: "url('/Homelogo.png')" }}
+      style={{ backgroundImage: "url('/chatcover.png')" }}
     >
       {/* Left Side Icon */}
       <div className="hidden md:flex flex-col items-center mr-10">

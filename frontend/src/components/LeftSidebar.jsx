@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BiMenu } from "react-icons/bi";
+
 import { CiSearch } from "react-icons/ci";
 import { IoChatboxEllipses } from "react-icons/io5";
 import API from "../api/axiosInstance";
@@ -44,7 +44,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
   };
 
   return (
-    <div className="bg-gray-700 text-white h-[80vh] w-[300px]  shadow-lg rounded-lg overflow-hidden">
+    <div className="bg-gray-500 text-white  w-[300px] h-screen shadow-lg  overflow-hidden">
       {/* Header Section */}
       <div className="p-4 flex justify-between items-center border-b border-green-500">
         <div className="flex items-center gap-2">
@@ -55,7 +55,9 @@ const LeftSidebar = ({ setSelectedUser }) => {
         <div className="relative">
           {/* 🔹 Menu Icon */}
           <div className="group">
-            <BiMenu className="text-3xl cursor-pointer hover:text-gray-700 transition duration-200" />
+            <p className="text-3xl cursor-pointer hover:text-gray-700 transition duration-200">
+              👨🏻
+            </p>
 
             {/* 🔹 Dropdown Menu (Visible on Hover) */}
             <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">

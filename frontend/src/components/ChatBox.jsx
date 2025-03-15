@@ -4,13 +4,16 @@ import { GoDotFill } from "react-icons/go";
 import { IoIosSend } from "react-icons/io";
 import { GrGallery } from "react-icons/gr";
 import { IoHelpCircleOutline } from "react-icons/io5";
+import { HiOutlineArrowSmLeft } from "react-icons/hi";
+import { HiOutlineArrowSmRight } from "react-icons/hi";
+
 import API from "../api/axiosInstance";
 import cloudinaryAPI from "../api/cloudinaryInstance";
 import { useAuth } from "../context/AuthContext";
 
 const socket = io("http://localhost:5000");
 
-const ChatBox = ({ selectedUser }) => {
+const ChatBox = ({ selectedUser, toggleLeftSidebar, toggleRightSidebar }) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
@@ -79,11 +82,11 @@ const ChatBox = ({ selectedUser }) => {
 
     let imageUrl = null;
 
-    // Upload image to Cloudinary using axios instance
+    // Upload image to Cloudinary
     if (selectedImage) {
       const formData = new FormData();
       formData.append("file", selectedImage);
-      formData.append("upload_preset", "chat_preset"); // Ensure correct preset
+      formData.append("upload_preset", "chat_preset"); // Cloudinary Upload Preset
 
       try {
         const uploadRes = await cloudinaryAPI.post("/image/upload", formData);
@@ -122,112 +125,142 @@ const ChatBox = ({ selectedUser }) => {
   };
 
   return (
-    <div className="h-[80vh] w-1/2 bg-white shadow-lg rounded-lg flex flex-col">
-      {/* 🔹 Chat Header */}
-      <div className="flex  p-4 border-b bg-gray-100">
-        <div className="flex items-center gap-3">
-          <img
-            className="w-10 h-10 rounded-full object-cover"
-            src={selectedUser?.profilePic || "/default-avatar.png"}
-            alt="User Avatar"
-          />
-          <div>
-            <p className="text-lg font-semibold">
-              {selectedUser?.username || "User"}
-            </p>
-            <p className="text-sm text-green-500 flex items-center gap-1">
-              <GoDotFill className="text-green-500" /> Online
-            </p>
-          </div>
-        </div>
-        <IoHelpCircleOutline className="text-xl cursor-pointer text-gray-600 hover:text-gray-900 transition duration-200" />
-      </div>
+    <div className="flex w-full  h-full   overflow-x-hidden  ">
+      {/* Chat Area */}
+      <div className="flex flex-col bg-gray-400 flex-1">
+        {/* Chat Header */}
+        <div className="flex justify-between items-center p-3 md:p-4 border-b bg-gray-300">
+          <div className="flex items-center gap-2 md:gap-3">
+            <img
+              className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
+              src={selectedUser?.profilePic || "/default-avatar.png"}
+              alt="User Avatar"
+            />
+            <div className="text-xs md:text-base relative group cursor-pointer ">
+              <p className="text-sm md:text-lg font-semibold">
+                {selectedUser?.username || "User"}
+              </p>
 
-      {/* 🔹 Chat Messages */}
-      <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-gray-50">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              msg.sender === user._id ? "justify-end" : "items-start gap-3"
-            }`}
-          >
-            {msg.sender !== user._id && (
-              <img
-                className="w-8 h-8 rounded-full object-cover"
-                src={selectedUser?.profilePic || "/default-avatar.png"}
-                alt="User Avatar"
-              />
-            )}
-            <div
-              className={`${
-                msg.sender === user._id
-                  ? "bg-green-500 text-white"
-                  : "bg-gray-200 text-gray-800"
-              } rounded-lg p-3 max-w-xs shadow-md`}
-            >
-              {msg.text && <p>{msg.text}</p>}
-              {msg.image && (
-                <img
-                  src={msg.image}
-                  alt="Sent"
-                  className="mt-2 rounded-lg max-w-xs"
-                />
-              )}
-              <div className="text-xs mt-1 opacity-75">
-                {new Date(msg.createdAt).toLocaleTimeString()}
-              </div>
+              <p className=" md:text-lg font-extralight w-[200px] absolute left-0 -bottom-8 bg-gray-700 text-white text-sm px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300  ">
+                {selectedUser?.status || "a syncTalk user"}
+              </p>
+
+              <p className="text-xs md:text-sm text-green-500 flex items-center gap-1">
+                <GoDotFill className="text-green-500" /> Online
+              </p>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* 🔹 Message Input Box */}
-      <div className="p-4 bg-white border-t flex items-center gap-3">
-        {imagePreview && (
-          <div className="relative">
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="w-16 h-16 rounded-md object-cover"
+          {/* Toggle buttons visible only on mobile */}
+          <div className="flex items-center gap-2 md:hidden">
+            <HiOutlineArrowSmLeft
+              onClick={toggleLeftSidebar}
+              className="cursor-pointer text-xl"
             />
-            <button
-              onClick={() => {
-                setSelectedImage(null);
-                setImagePreview(null);
-              }}
-              className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-2 py-1 text-xs"
-            >
-              ✕
-            </button>
+            <HiOutlineArrowSmRight
+              onClick={toggleRightSidebar}
+              className="cursor-pointer text-xl"
+            />
           </div>
-        )}
-        <input
-          type="text"
-          placeholder="Type a message..."
-          value={messageText}
-          onChange={(e) => setMessageText(e.target.value)}
-          className="flex-1 border rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-green-400"
-        />
-        <input
-          type="file"
-          id="image"
-          accept="image/png, image/jpeg"
-          hidden
-          onChange={handleImageChange}
-        />
-        <label
-          htmlFor="image"
-          className="cursor-pointer text-gray-600 hover:text-gray-900 transition duration-200"
-        >
-          <GrGallery className="text-2xl" />
-        </label>
-        <button
-          onClick={handleSendMessage}
-          className="bg-green-500 text-white rounded-full p-2 hover:bg-green-600 transition duration-200"
-        >
-          <IoIosSend className="text-xl" />
-        </button>
+
+          <div className="hidden md:flex items-center gap-2">
+            <IoHelpCircleOutline className="text-xl cursor-pointer text-gray-600 hover:text-gray-900 transition duration-200" />
+          </div>
+        </div>
+
+        {/* Chat Messages */}
+        <div className="flex-1 p-2 md:p-4 space-y-3    overflow-y-auto bg-gray-400">
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`flex ${
+                msg.sender === user._id
+                  ? "justify-end"
+                  : "items-start gap-2 md:gap-3"
+              }`}
+            >
+              {msg.sender !== user._id && (
+                <img
+                  className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover"
+                  src={selectedUser?.profilePic || "/default-avatar.png"}
+                  alt="User Avatar"
+                />
+              )}
+
+              <div
+                className={`${
+                  msg.sender === user._id
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-200 text-gray-800"
+                } rounded-lg p-2 md:p-3 max-w-[70%] md:max-w-xs shadow-md break-words`}
+              >
+                {msg.text && <p className="text-sm md:text-base">{msg.text}</p>}
+                {msg.image && (
+                  <img
+                    src={msg.image}
+                    alt="Sent"
+                    className="mt-2 rounded-lg max-w-[200px] md:max-w-xs"
+                  />
+                )}
+                <div className="text-[10px] md:text-xs mt-1 opacity-75 text-right">
+                  {new Date(msg.createdAt).toLocaleTimeString()}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Message Input */}
+        <div className="p-2 md:p-4 bg-white border-t flex items-center gap-2 md:gap-3">
+          {imagePreview && (
+            <div className="relative">
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="w-12 h-12 md:w-16 md:h-16 rounded-md object-cover"
+              />
+              <button
+                onClick={() => {
+                  setSelectedImage(null);
+                  setImagePreview(null);
+                }}
+                className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-1 py-0.5 text-xs"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          <input
+            type="text"
+            placeholder="Type a message..."
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
+            className="flex-1 border rounded-full px-3 py-1.5 md:px-4 md:py-2 outline-none focus:ring-2 focus:ring-green-400 text-sm md:text-base"
+          />
+
+          <input
+            type="file"
+            id="image"
+            accept="image/png, image/jpeg"
+            hidden
+            onChange={handleImageChange}
+          />
+
+          <label
+            htmlFor="image"
+            className="cursor-pointer text-gray-600 hover:text-gray-900 transition duration-200"
+          >
+            <GrGallery className="text-xl md:text-2xl" />
+          </label>
+
+          <button
+            onClick={handleSendMessage}
+            className="bg-green-500 text-white rounded-full p-2 hover:bg-green-600 transition duration-200"
+          >
+            <IoIosSend className="text-xl" />
+          </button>
+        </div>
       </div>
     </div>
   );

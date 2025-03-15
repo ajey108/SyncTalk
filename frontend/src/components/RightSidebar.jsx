@@ -11,7 +11,7 @@ const RightSidebar = () => {
   }, []);
   if (loading) return <p>Loading...</p>;
   return (
-    <div className="bg-white shadow-lg h-[80vh] rounded-lg p-6 w-72">
+    <div className="bg-gray-500 text-white shadow-lg h-full w-[300px]   p-6 ">
       {/* 🔹 Profile Section */}
       <div className="flex items-center gap-3 mb-4">
         <img
@@ -26,7 +26,7 @@ const RightSidebar = () => {
           </p>
         </div>
       </div>
-      <p className="text-gray-600 mb-4">{user.status || "hey there"}</p>
+      <p className="text-white mb-4">{user.status || "hey there"}</p>
 
       <hr className="mb-4 opacity-50" />
 
