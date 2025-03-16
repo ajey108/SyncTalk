@@ -7,8 +7,15 @@ import { toast } from "react-toastify";
 
 const LeftSidebar = ({ setSelectedUser }) => {
   const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
 
   console.log("users in leftsidebar", users);
+
+  //search users
+
+  const filteredUsers = users.filter((user) =>
+    user.username.toLowerCase().includes(search.toLowerCase())
+  );
 
   //get users for letfsidebar
   useEffect(() => {
@@ -49,7 +56,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
       <div className="p-4 flex justify-between items-center border-b border-green-500">
         <div className="flex items-center gap-2">
           <IoChatboxEllipses className="text-2xl" />
-          <span className="text-lg font-semibold">SYNCTALK</span>
+          <span className="text-lg font-semibold">SYNCTALK💬</span>
         </div>
 
         <div className="relative">
@@ -85,14 +92,16 @@ const LeftSidebar = ({ setSelectedUser }) => {
         <input
           type="text"
           placeholder="Search here..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           className="bg-transparent border border-gray-400 rounded-md px-3 py-1 text-white w-full focus:outline-none focus:ring-2 focus:ring-white-400"
         />
       </div>
 
       {/* Chat List */}
       <div className="p-3 overflow-y-auto h-full">
-        {users.length > 0 ? (
-          users.map((user) => (
+        {filteredUsers.length > 0 ? (
+          filteredUsers.map((user) => (
             <div
               key={user._id} // Ensure each item has a unique key
               className="flex items-center gap-3 p-3 rounded-md hover:bg-green-800 cursor-pointer transition duration-200"

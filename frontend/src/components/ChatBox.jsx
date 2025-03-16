@@ -24,6 +24,10 @@ const ChatBox = ({ selectedUser, toggleLeftSidebar, toggleRightSidebar }) => {
   const [imagePreview, setImagePreview] = useState(null);
   console.log("Selected Image:", selectedImage);
 
+  // notification sound
+  const notificationSound = new Audio("/ios_notification.mp3");
+  notificationSound.load();
+
   useEffect(() => {
     if (user?._id) {
       //If user exists and has a valid _id, join their room
@@ -56,6 +60,7 @@ const ChatBox = ({ selectedUser, toggleLeftSidebar, toggleRightSidebar }) => {
         newMessage.receiver === selectedUser._id
       ) {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
+        notificationSound.play(); // Play notification sound
       }
     };
 
@@ -125,7 +130,7 @@ const ChatBox = ({ selectedUser, toggleLeftSidebar, toggleRightSidebar }) => {
   };
 
   return (
-    <div className="flex w-full  h-full   overflow-x-hidden  ">
+    <div className="flex w-full  h-full   overflow-x-hidden overflow-y-hidden md:overflow-y-auto">
       {/* Chat Area */}
       <div className="flex flex-col bg-gray-400 flex-1">
         {/* Chat Header */}
