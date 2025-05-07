@@ -2,15 +2,18 @@ import React, { useState } from "react";
 import ChatBox from "../components/ChatBox";
 import LeftSidebar from "../components/LeftSidebar";
 import RightSidebar from "../components/RightSidebar";
+import { RxCross2 } from "react-icons/rx";
 
 const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
-
+  const [messages, setMessages] = useState([]);
   const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
 
   const toggleLeftSidebar = () => setLeftSidebarOpen((prev) => !prev);
   const toggleRightSidebar = () => setRightSidebarOpen((prev) => !prev);
+
+  console.log("Messages in Chat.jsx:", messages);
 
   return (
     <div className="w-full h-screen">
@@ -25,10 +28,10 @@ const Chat = () => {
           <div className="fixed top-0 left-0 h-full w-[300px] bg-white shadow-lg z-20 md:hidden">
             <LeftSidebar setSelectedUser={setSelectedUser} />
             <button
-              className="absolute top-4 right-4 text-black"
+              className="absolute top-4 right-0 text-black"
               onClick={toggleLeftSidebar}
             >
-              ❌
+              <RxCross2 />
             </button>
           </div>
         )}
@@ -39,12 +42,18 @@ const Chat = () => {
             toggleLeftSidebar={toggleLeftSidebar}
             toggleRightSidebar={toggleRightSidebar}
             selectedUser={selectedUser}
+            messages={messages}
+            setMessages={setMessages}
           />
         </div>
 
         {/* Right Sidebar for desktop  */}
         <div className="hidden md:block w-[300px] bg-white shadow-lg relative">
-          <RightSidebar onClose={toggleRightSidebar} />
+          <RightSidebar
+            onClose={toggleRightSidebar}
+            selectedUser={selectedUser}
+            messages={messages}
+          />
         </div>
 
         {/* Right Sidebar for mobile  */}
@@ -55,7 +64,7 @@ const Chat = () => {
               className="absolute top-4 left-4 text-black"
               onClick={toggleRightSidebar}
             >
-              ❌
+              <RxCross2 />
             </button>
           </div>
         )}

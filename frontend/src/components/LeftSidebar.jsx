@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { SlUser } from "react-icons/sl";
 
 import { CiSearch } from "react-icons/ci";
 import { IoChatboxEllipses } from "react-icons/io5";
@@ -63,7 +64,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
           {/* 🔹 Menu Icon */}
           <div className="group">
             <p className="text-3xl cursor-pointer hover:text-gray-700 transition duration-200">
-              👨🏻
+              <SlUser />
             </p>
 
             {/* 🔹 Dropdown Menu (Visible on Hover) */}
@@ -72,7 +73,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
                 onClick={handleProfile}
                 className="px-4 py-2 text-gray-700 hover:bg-green-500 rounded-md cursor-pointer"
               >
-                👤Profile
+                Profile
               </p>
               <hr className="border-gray-200 my-1" />
               <p
@@ -103,7 +104,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
         {filteredUsers.length > 0 ? (
           filteredUsers.map((user) => (
             <div
-              key={user._id} // Ensure each item has a unique key
+              key={user._id}
               className="flex items-center gap-3 p-3 rounded-md hover:bg-green-800 cursor-pointer transition duration-200"
               onClick={() => setSelectedUser(user)} // Set selected user on click
             >

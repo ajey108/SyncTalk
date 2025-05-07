@@ -13,13 +13,20 @@ import { useAuth } from "../context/AuthContext";
 
 const socket = io("http://localhost:5000");
 
-const ChatBox = ({ selectedUser, toggleLeftSidebar, toggleRightSidebar }) => {
+const ChatBox = ({
+  selectedUser,
+  toggleLeftSidebar,
+  toggleRightSidebar,
+  messages,
+  setMessages,
+}) => {
   const { user } = useAuth();
-  const [messages, setMessages] = useState([]);
+
   const [messageText, setMessageText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
 
   console.log("selectedUser", selectedUser);
+  console.log("messages in chatbox are", messages);
 
   const [imagePreview, setImagePreview] = useState(null);
   console.log("Selected Image:", selectedImage);
