@@ -12,14 +12,11 @@ import cloudinaryAPI from "../api/cloudinaryInstance";
 import { useAuth } from "../context/AuthContext";
 import { API_URL } from "../cofig";
 
-<<<<<<< HEAD
 const socket = io(SOCKET_URL, {
   withCredentials: true,
   autoConnect: false, // Optional: connect manually when needed
   transports: ["websocket", "polling"], // Fallback options
 });
-
-
 
 const ChatBox = ({
   selectedUser,
