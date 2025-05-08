@@ -18,9 +18,8 @@ const socket = io(SOCKET_URL, {
   autoConnect: false, // Optional: connect manually when needed
   transports: ["websocket", "polling"], // Fallback options
 });
-=======
-const socket = io("https://synctalk-backend.onrender.com");
->>>>>>> cb1c0ca7f4367d5dbb923bc24e0a253785002fb2
+
+
 
 const ChatBox = ({
   selectedUser,
