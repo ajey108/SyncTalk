@@ -7,11 +7,16 @@ import { IoHelpCircleOutline } from "react-icons/io5";
 import { HiOutlineArrowSmLeft } from "react-icons/hi";
 import { HiOutlineArrowSmRight } from "react-icons/hi";
 
-import API from "../api/axiosInstance";
+import { SOCKET_URL } from "../config";
 import cloudinaryAPI from "../api/cloudinaryInstance";
 import { useAuth } from "../context/AuthContext";
+import { API_URL } from "../cofig";
 
-const socket = io("http://localhost:5000");
+const socket = io(SOCKET_URL, {
+  withCredentials: true,
+  autoConnect: false, // Optional: connect manually when needed
+  transports: ["websocket", "polling"], // Fallback options
+});
 
 const ChatBox = ({
   selectedUser,
@@ -48,7 +53,9 @@ const ChatBox = ({
 
     const fetchMessages = async () => {
       try {
-        const res = await API.get(`/messages/${user._id}/${selectedUser._id}`);
+        const res = await API_URL.get(
+          `/messages/${user._id}/${selectedUser._id}`
+        );
         setMessages(res.data);
       } catch (error) {
         console.error(
@@ -122,7 +129,7 @@ const ChatBox = ({
     };
 
     try {
-      const res = await API.post("/messages/send", newMessage);
+      const res = await API_URL.post("/messages/send", newMessage);
       setMessages((prev) => [...prev, { ...newMessage, ...res.data }]);
       socket.emit("sendMessage", res.data);
       setMessageText("");

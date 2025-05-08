@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import API from "../api/axiosInstance";
+
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import { API_URL } from "../cofig";
 
 const ProfileUpdate = () => {
   const { user, setUser } = useAuth();
@@ -38,7 +39,7 @@ const ProfileUpdate = () => {
     }
 
     try {
-      const response = await API.put("/users/update", data, {
+      const response = await API_URL.put("/users/update", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
