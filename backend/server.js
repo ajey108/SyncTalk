@@ -10,7 +10,7 @@ import userRoute from "./routes/userRoute.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import setupSocket from "./socket/socket.js";
-import serverless from "serverless-http";
+
 dotenv.config();
 connectDB();
 
@@ -41,5 +41,4 @@ if (process.env.NODE_ENV !== "production") {
   server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
-//Export app for vercel
-export const handler = serverless(app);
+export default server;
