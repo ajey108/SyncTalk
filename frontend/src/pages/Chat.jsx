@@ -28,7 +28,7 @@ const Chat = () => {
           <div className="fixed top-0 left-0 h-full w-[300px] bg-white shadow-lg z-20 md:hidden">
             <LeftSidebar setSelectedUser={setSelectedUser} />
             <button
-              className="absolute top-4 right-0 text-black"
+              className="absolute top-4 right-0 text-white"
               onClick={toggleLeftSidebar}
             >
               <RxCross2 />
@@ -56,12 +56,16 @@ const Chat = () => {
           />
         </div>
 
-        {/* Right Sidebar for mobile  */}
+        {/* Right Sidebar for mobile */}
         {isRightSidebarOpen && (
           <div className="fixed top-0 right-0 h-full w-[300px] bg-white shadow-lg z-20 md:hidden">
-            <RightSidebar onClose={toggleRightSidebar} />
+            <RightSidebar
+              onClose={toggleRightSidebar}
+              selectedUser={selectedUser} // Pass selectedUser
+              messages={messages} // Pass messages
+            />
             <button
-              className="absolute top-4 left-4 text-black"
+              className="absolute top-4 left-4 text-white"
               onClick={toggleRightSidebar}
             >
               <RxCross2 />

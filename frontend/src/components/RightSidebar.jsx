@@ -3,7 +3,16 @@ import { GoDotFill } from "react-icons/go";
 
 const RightSidebar = ({ selectedUser, messages }) => {
   console.log("messages from right", messages);
-  if (!selectedUser) return <p>Select a user to view their profile.</p>;
+  if (!selectedUser)
+    return (
+      <div className="bg-zinc-900 text-white shadow-lg h-full w-[300px] p-6 flex flex-col items-center justify-center">
+        <img
+          className="w-24 h-24 mb-4"
+          src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTZtYWZodXpodDd2MTk5bDlraHlzMTIwdmRwNmlpaWxzZHIycWxtcSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/YyKPbc5OOTSQE/giphy.gif"
+          alt="No media available"
+        />
+      </div>
+    );
 
   //   get only images
   const sharedMedia = messages
@@ -13,7 +22,7 @@ const RightSidebar = ({ selectedUser, messages }) => {
   console.log("images from sharedMed is", sharedMedia);
 
   return (
-    <div className="bg-gray-500 text-white shadow-lg h-full w-[300px] p-6">
+    <div className="bg-zinc-900 text-white shadow-lg h-full w-[300px] p-6">
       {/* 🔹 Profile Section */}
       <div className="flex items-center gap-3 mb-4">
         <img
@@ -45,9 +54,7 @@ const RightSidebar = ({ selectedUser, messages }) => {
             />
           ))
         ) : (
-          <p className="text-sm text-gray-300 col-span-2">
-            No shared media available.
-          </p>
+          <p className="text-gray-700">No shared media available</p>
         )}
       </div>
     </div>

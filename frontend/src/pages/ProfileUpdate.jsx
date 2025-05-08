@@ -62,11 +62,9 @@ const ProfileUpdate = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
-      <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
-          Update Profile
-        </h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-950 px-4">
+      <div className="text-white border-4 shadow-lg rounded-xl p-8 w-full max-w-md">
+        <h1 className="text-3xl font-bold  text-center mb-6">Update Profile</h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {/* Username Input */}
