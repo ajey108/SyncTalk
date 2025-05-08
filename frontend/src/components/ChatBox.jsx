@@ -10,7 +10,7 @@ import { HiOutlineArrowSmRight } from "react-icons/hi";
 import { SOCKET_URL } from "../config";
 import cloudinaryAPI from "../api/cloudinaryInstance";
 import { useAuth } from "../context/AuthContext";
-import { API_URL } from "../cofig";
+import { API_URL } from "../config";
 
 const socket = io(SOCKET_URL, {
   withCredentials: true,
