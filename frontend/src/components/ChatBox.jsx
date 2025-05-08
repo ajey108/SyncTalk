@@ -12,11 +12,15 @@ import cloudinaryAPI from "../api/cloudinaryInstance";
 import { useAuth } from "../context/AuthContext";
 import { API_URL } from "../cofig";
 
+<<<<<<< HEAD
 const socket = io(SOCKET_URL, {
   withCredentials: true,
   autoConnect: false, // Optional: connect manually when needed
   transports: ["websocket", "polling"], // Fallback options
 });
+=======
+const socket = io("https://synctalk-backend.onrender.com");
+>>>>>>> cb1c0ca7f4367d5dbb923bc24e0a253785002fb2
 
 const ChatBox = ({
   selectedUser,
