@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { io } from "socket.io-client";
-import { GoDotFill } from "react-icons/go";
 import { IoIosSend } from "react-icons/io";
 import { GrGallery } from "react-icons/gr";
 import { IoHelpCircleOutline } from "react-icons/io5";
@@ -98,7 +97,7 @@ const ChatBox = ({
     if (selectedImage) {
       const formData = new FormData();
       formData.append("file", selectedImage);
-      formData.append("upload_preset", "chat_preset"); // Cloudinary Upload Preset
+      formData.append("upload_preset", "chat_sync"); // Cloudinary Upload Preset
 
       try {
         const uploadRes = await cloudinaryAPI.post("/image/upload", formData);

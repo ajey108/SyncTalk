@@ -28,7 +28,7 @@ const ProfileUpdate = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Show loader
+    setLoading(true);
 
     const data = new FormData();
     data.append("username", formData.username);
@@ -38,18 +38,15 @@ const ProfileUpdate = () => {
     }
 
     try {
-      const response = await API.put("/users/update", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
+      const response = await API.put("/users/update", data);
       if (response.status === 200) {
         console.log("Updated User from API:", response.data);
-        setUser(response.data); // Update user in context
+        setUser(response.data); // Update user context
         toast.success("Profile updated successfully!");
 
-        setTimeout(() => {
-          window.location.href = "/chat";
-        }, 600);
+        // setTimeout(() => {
+        //   window.location.href = "/chat";
+        // }, 600);
       } else {
         toast.error("Failed to update profile");
       }
@@ -57,7 +54,7 @@ const ProfileUpdate = () => {
       console.error("Error updating profile:", error);
       toast.error("Failed to update profile");
     } finally {
-      setLoading(false); // Hide loader
+      setLoading(false);
     }
   };
 

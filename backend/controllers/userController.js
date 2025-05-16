@@ -53,53 +53,44 @@ const upload = multer({ storage });
 // Update Profile (Profile Pic, Name, Status)
 export const updateProfile = async (req, res) => {
   try {
-    // Handle file upload
     upload.single("profilePic")(req, res, async (err) => {
       if (err) return res.status(500).json({ error: err.message });
 
       const { username, status } = req.body;
-      console.log("Received data:", { username, status });
-
-      let imageUrl = req.user.profilePic; // Keep the old profile picture
+      let imageUrl = req.user.profilePic;
 
       if (req.file) {
-        console.log("Uploading new profile picture...");
-
-        // Upload image to Cloudinary and wait for response
         try {
-          const result = await new Promise((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream(
-              { folder: "chat-app/profiles" },
-              (error, result) => {
-                if (error) reject(error);
-                else resolve(result);
-              }
-            );
-            uploadStream.end(req.file.buffer);
+          const base64Image = `data:${
+            req.file.mimetype
+          };base64,${req.file.buffer.toString("base64")}`;
+
+          const result = await cloudinary.uploader.upload(base64Image, {
+            upload_preset: "chat_sync",
+            unsigned: true,
           });
 
-          imageUrl = result.secure_url; // Get uploaded image URL
-          console.log("Cloudinary Upload Success:", imageUrl);
+          imageUrl = result.secure_url;
         } catch (uploadError) {
-          return res.status(500).json({ error: uploadError.message });
+          console.error("Cloudinary Upload Error:", uploadError);
+          return res.status(500).json({
+            error: "Image upload failed",
+            details: uploadError.message,
+          });
         }
       }
 
-      // Update user in the database
       const updatedUser = await User.findByIdAndUpdate(
         req.user.id,
         { username, status, profilePic: imageUrl },
         { new: true }
       );
-      console.log("User from req.user:", req.user);
-      console.log("User ID from req.user:", req.user?.id);
 
       if (!updatedUser) {
         return res.status(404).json({ error: "User not found" });
       }
 
-      console.log("Updated User:", updatedUser);
-      res.json(updatedUser); // Send updated user object
+      res.json(updatedUser);
     });
   } catch (err) {
     console.error("Error updating profile:", err);
