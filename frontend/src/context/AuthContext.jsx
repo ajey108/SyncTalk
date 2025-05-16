@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import API from "../api/axiosInstance";
+import { API_URL } from "../config";
 
 const AuthContext = createContext();
 
@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await API.get("/users/me", { withCredentials: true });
+        const res = await API_URL.get("/users/me", { withCredentials: true });
         setUser(res.data);
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
   // refresh user data (for updates)
   const updateUser = async () => {
     try {
-      const res = await API.get("/users/me", { withCredentials: true });
+      const res = await API_URL.get("/users/me", { withCredentials: true });
       setUser(res.data); // Update user state
     } catch (error) {
       console.error("Error fetching user:", error);

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import API from "../api/axiosInstance";
+
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import { API_URL } from "../cofig";
 
 const ProfileUpdate = () => {
   const { user, setUser } = useAuth();

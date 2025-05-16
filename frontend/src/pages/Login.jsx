@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { IoLogoWechat } from "react-icons/io5";
-import API from "../api/axiosInstance";
+import { API_URL } from "../cofig";
 import { toast } from "react-toastify";
 
 const Login = () => {
@@ -26,14 +26,14 @@ const Login = () => {
 
     try {
       if (currentState === "Sign up") {
-        await API.post(`/auth/register`, formData, {
+        await API_URL.post(`/auth/register`, formData, {
           withCredentials: true, // Enable cookies
         });
 
         toast("Account created successfully! Please log in.");
         setCurrentState("Login");
       } else {
-        await API.post(`/auth/login`, formData, {
+        await API_URL.post(`/auth/login`, formData, {
           withCredentials: true, // Enable cookies
         });
         toast.success("Login successful! 🎉");
