@@ -19,7 +19,7 @@ const Chat = () => {
     <div className="w-full h-screen">
       <div className="flex  justify-center w-full h-full">
         {/* Left Sidebar for desktop  */}
-        <div className="hidden md:block w-[300px] bg-white shadow-lg">
+        <div className="hidden md:block w-[300px]  shadow-lg">
           <LeftSidebar setSelectedUser={setSelectedUser} />
         </div>
 

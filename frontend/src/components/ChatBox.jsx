@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { io } from "socket.io-client";
+
 import { IoIosSend } from "react-icons/io";
 import { GrGallery } from "react-icons/gr";
 import { IoHelpCircleOutline } from "react-icons/io5";
 import { HiOutlineArrowSmLeft } from "react-icons/hi";
 import { HiOutlineArrowSmRight } from "react-icons/hi";
 
-import { SOCKET_URL } from "../config";
+import API from "../api/axiosInstance";
 import cloudinaryAPI from "../api/cloudinaryInstance";
 import { useAuth } from "../context/AuthContext";
-import { API_URL } from "../config";
 
-const socket = io(SOCKET_URL, {
-  withCredentials: true,
-  autoConnect: false, // Optional: connect manually when needed
-  transports: ["websocket", "polling"], // Fallback options
-});
+const socket = io("http://localhost:5000");
 
 const ChatBox = ({
   selectedUser,
@@ -50,11 +46,10 @@ const ChatBox = ({
   useEffect(() => {
     if (!selectedUser || !user?._id) return;
 
+    //fetch messages
     const fetchMessages = async () => {
       try {
-        const res = await API_URL.get(
-          `/messages/${user._id}/${selectedUser._id}`
-        );
+        const res = await API.get(`/messages/${user._id}/${selectedUser._id}`);
         setMessages(res.data);
       } catch (error) {
         console.error(
@@ -128,7 +123,7 @@ const ChatBox = ({
     };
 
     try {
-      const res = await API_URL.post("/messages/send", newMessage);
+      const res = await API.post("/messages/send", newMessage);
       setMessages((prev) => [...prev, { ...newMessage, ...res.data }]);
       socket.emit("sendMessage", res.data);
       setMessageText("");
@@ -143,16 +138,27 @@ const ChatBox = ({
   };
 
   return (
-    <div className="flex w-full h-full overflow-x-hidden overflow-y-hidden md:overflow-y-auto">
+    <div className="flex w-full h-full overflow-x-hidden overflow-y-hidden md:overflow-y-auto border-2 border-white">
       {/* Check if a user is selected */}
       {!selectedUser ? (
         <div className="flex flex-col items-center justify-center text-white flex-1 bg-zinc-900 text-center">
           <h1 className="text-2xl md:text-4xl font-bold">
             Welcome to SyncTalk!
           </h1>
-          <p className="text-sm md:text-base  mt-2">
+          <p className="text-sm md:text-base mt-2  ">
             Select a user from the sidebar to start chatting.
           </p>
+
+          <div className="flex items-center gap-2 md:hidden">
+            <HiOutlineArrowSmLeft
+              onClick={toggleLeftSidebar}
+              className="cursor-pointer text-white text-xl"
+            />
+            <HiOutlineArrowSmRight
+              onClick={toggleRightSidebar}
+              className="cursor-pointer text-white text-xl"
+            />
+          </div>
         </div>
       ) : (
         <div className="flex flex-col bg-gray-400 flex-1">
@@ -192,7 +198,7 @@ const ChatBox = ({
           </div>
 
           {/* Chat Messages */}
-          <div className="flex-1 p-2 md:p-4 space-y-3 overflow-y-auto bg-zinc-900">
+          <div className="flex-1 p-1 md:p-4 space-y-3 overflow-y-auto bg-zinc-900">
             {messages.map((msg, index) => (
               <div
                 key={index}
@@ -224,7 +230,7 @@ const ChatBox = ({
                     <img
                       src={msg.image}
                       alt="Sent"
-                      className="mt-2 rounded-lg max-w-[200px] md:max-w-xs"
+                      className="mt-2 rounded-lg w-full max-w-[180px] md:max-w-xs object-cover"
                     />
                   )}
                   <div className="text-[10px] md:text-xs mt-1 opacity-75 text-right">

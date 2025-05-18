@@ -3,7 +3,7 @@ import { SlUser } from "react-icons/sl";
 
 import { CiSearch } from "react-icons/ci";
 import { IoChatboxEllipses } from "react-icons/io5";
-import { API_URL } from "../cofig";
+import API from "../api/axiosInstance";
 import { toast } from "react-toastify";
 
 const LeftSidebar = ({ setSelectedUser }) => {
@@ -22,7 +22,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await API_URL.get("/users/");
+        const res = await API.get("/users/");
         setUsers(res.data);
       } catch (err) {
         console.error("Error fetching users:", err);
@@ -40,7 +40,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
   //logouot
   const handleLogout = async () => {
     try {
-      await API_URL.post("/auth/logout");
+      await API.post("/auth/logout");
       toast.success("Logged out successfully");
       setTimeout(() => {
         window.location.href = "/"; // Redirect to login page
