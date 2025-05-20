@@ -18,16 +18,13 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: [
-      "https://synctalk-frontend.onrender.com ",
-      "http://localhost:5173",
-    ],
+    origin: [process.env.VITE_API_URL || "http://localhost:5174"],
   },
 });
 
 app.use(
   cors({
-    origin: ["https://synctalk-frontend.onrender.com", "http://localhost:5173"],
+    origin: [process.env.VITE_API_URL || "http://localhost:5174"],
     credentials: true,
   })
 );
