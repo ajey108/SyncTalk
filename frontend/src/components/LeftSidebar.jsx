@@ -13,7 +13,6 @@ const LeftSidebar = ({ setSelectedUser }) => {
   console.log("users in leftsidebar", users);
 
   //search users
-
   const filteredUsers = users.filter((user) =>
     user.username.toLowerCase().includes(search.toLowerCase())
   );
