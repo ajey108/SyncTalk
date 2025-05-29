@@ -11,8 +11,10 @@ import API from "../api/axiosInstance";
 import cloudinaryAPI from "../api/cloudinaryInstance";
 import { useAuth } from "../context/AuthContext";
 
-const socket = io("https://synctalk-backend.onrender.com/api");
-//http://localhost:5000
+const socket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000", {
+  transports: ["websocket", "polling"],
+});
+
 const ChatBox = ({
   selectedUser,
   toggleLeftSidebar,

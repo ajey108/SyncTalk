@@ -4,6 +4,8 @@ export default function setupSocket(server) {
   console.log("Socket server is being initialized...");
   const io = new Server(server, {
     cors: { origin: "*" },
+    transports: ["websocket", "polling"],
+    methods: ["GET", "POST"],
   });
 
   // Store userId -> socketId mapping
