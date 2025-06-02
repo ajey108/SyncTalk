@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: `http://localhost:5000/api`, // Replace with your API URL
+  baseURL: `https://synctalk-backend.onrender.com/api`, // Replace with your API URL
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",

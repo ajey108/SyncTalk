@@ -11,7 +11,7 @@ import API from "../api/axiosInstance";
 import cloudinaryAPI from "../api/cloudinaryInstance";
 import { useAuth } from "../context/AuthContext";
 
-const socket = io(import.meta.env.VITE_SOCKET_URL, {
+const socket = io("https://synctalk-backend.onrender.com", {
   transports: ["websocket", "polling"],
   withCredentials: true,
   secure: true, // Force HTTPS
