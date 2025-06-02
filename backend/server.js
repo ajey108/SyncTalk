@@ -17,23 +17,41 @@ connectDB();
 const app = express();
 const server = createServer(app);
 
-const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:5173"];
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:4173",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
 
+console.log("allowed orgs", allowedOrigins);
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
+    exposedHeaders: ["set-cookie"],
   },
 });
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
 
 app.use(cookieParser());
 app.use(express.json());
+
+// check route
+app.get("/", (req, res) => {
+  res.send("SyncTalk backend is running!");
+});
 
 // Routes
 app.use("/api/auth", authRoutes);

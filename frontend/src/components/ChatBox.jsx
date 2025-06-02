@@ -11,8 +11,11 @@ import API from "../api/axiosInstance";
 import cloudinaryAPI from "../api/cloudinaryInstance";
 import { useAuth } from "../context/AuthContext";
 
-const socket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000", {
+const socket = io(import.meta.env.VITE_SOCKET_URL, {
   transports: ["websocket", "polling"],
+  withCredentials: true,
+  secure: true, // Force HTTPS
+  autoConnect: false, // Wait until auth is ready
 });
 
 const ChatBox = ({
