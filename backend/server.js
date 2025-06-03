@@ -6,7 +6,10 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import messageRoute from "./routes/messageRoute.js";
 import userRoute from "./routes/userRoute.js";
-import path from "path";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 import { createServer } from "http";
 import { Server } from "socket.io";
