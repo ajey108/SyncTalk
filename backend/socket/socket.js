@@ -10,11 +10,20 @@ export default function setupSocket(server) {
     "http://localhost:3000",
     "https://synctalk-frontend.onrender.com",
   ];
+
   const io = new Server(server, {
-    cors: { origin: allowedOrigins },
+    cors: {
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS (Socket.IO)"));
+        }
+      },
+      credentials: true,
+      methods: ["GET", "POST"],
+    },
     transports: ["websocket", "polling"],
-    methods: ["GET", "POST"],
-    credentials: true,
   });
 
   // Store userId -> socketId mapping
