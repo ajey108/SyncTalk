@@ -2,8 +2,16 @@ import { Server } from "socket.io";
 
 export default function setupSocket(server) {
   console.log("Socket server is being initialized...");
+
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    "http://localhost:4173",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://synctalk-frontend.onrender.com",
+  ];
   const io = new Server(server, {
-    cors: { origin: "*" },
+    cors: { origin: allowedOrigins },
     transports: ["websocket", "polling"],
     methods: ["GET", "POST"],
   });
