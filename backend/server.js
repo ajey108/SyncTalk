@@ -48,7 +48,10 @@ app.use(
 
 app.use(cookieParser());
 app.use(express.json());
-
+console.log({
+  __dirname,
+  fullpath: path.join(__dirname, "public"),
+});
 app.use(express.static(path.join(__dirname, "public")));
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
