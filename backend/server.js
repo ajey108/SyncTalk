@@ -26,12 +26,7 @@ const allowedOrigins = [
 ];
 
 console.log("allowed orgs", allowedOrigins);
-const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    exposedHeaders: ["set-cookie"],
-  },
-});
+const io = new Server(server);
 
 app.use(
   cors({
