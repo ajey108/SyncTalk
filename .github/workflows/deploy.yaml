@@ -40,6 +40,9 @@ jobs:
           cd backend
           npm ci
 
+      - name: List backend/public contents
+        run: ls -l backend/public
+
       #  Deploy step
       - name: Deploy to production
         uses: johnbeynon/render-deploy-action@v0.0.8
