@@ -14,6 +14,7 @@ export default function setupSocket(server) {
     cors: { origin: allowedOrigins },
     transports: ["websocket", "polling"],
     methods: ["GET", "POST"],
+    credentials: true,
   });
 
   // Store userId -> socketId mapping
