@@ -15,7 +15,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20.17.0
 
       # Install and build frontend
       - name: Install frontend dependencies
@@ -28,11 +28,11 @@ jobs:
           cd frontend
           npm run build
 
-      # Copy build to backend/public
+      # Copy build to backend/
       - name: Copy frontend build to backend
         run: |
           rm -rf backend/public
-          cp -r frontend/build backend/public
+          cp -r frontend/dist backend/public
 
       # Install backend dependencies
       - name: Install backend dependencies
@@ -40,13 +40,10 @@ jobs:
           cd backend
           npm ci
 
-      # (Optional) Run backend tests
-      # - name: Run backend tests
-      #   run: |
-      #     cd backend
-      #     npm test
-
-      # (Optional) Deploy step
-      # - name: Deploy backend
-      #   run: |
-      #     # Add your deployment script here (e.g., SSH, Render CLI, etc.)
+      #  Deploy step
+      - name: Deploy to production
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.MY_RENDER_SERVICE_ID }}
+          api-key: ${{ secrets.MY_RENDER_API_KEY }}
+          wait-for-success: true

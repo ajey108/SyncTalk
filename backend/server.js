@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import messageRoute from "./routes/messageRoute.js";
 import userRoute from "./routes/userRoute.js";
+import path from "path";
 
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -43,6 +44,11 @@ app.use(
 
 app.use(cookieParser());
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, "./backend/public")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../backend/public", "index.html"));
+});
 
 // check route
 app.get("/", (req, res) => {
