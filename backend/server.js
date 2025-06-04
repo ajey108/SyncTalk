@@ -8,7 +8,6 @@ import messageRoute from "./routes/messageRoute.js";
 import userRoute from "./routes/userRoute.js";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
-import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -57,19 +56,11 @@ const publicPath = path.join(__dirname, "public");
 console.log("Serving static files from:", publicPath);
 
 // Serve static files
-app.use(express.static(publicPath));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Handle SPA fallback
 app.get("*", (req, res) => {
-  const indexPath = path.join(publicPath, "index.html");
-  console.log("Attempting to serve:", indexPath);
-
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    console.error("index.html not found at:", indexPath);
-    res.status(404).send("File not found");
-  }
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // check route
