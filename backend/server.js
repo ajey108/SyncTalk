@@ -58,11 +58,6 @@ console.log("Serving static files from:", publicPath);
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// Handle SPA fallback
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
 // check route
 app.get("/", (req, res) => {
   res.send("SyncTalk backend is running!");
@@ -72,6 +67,11 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoute);
 app.use("/api/users", userRoute);
+
+// Handle SPA fallback
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 // Initialize Socket.io
 setupSocket(server);
