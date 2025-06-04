@@ -1,0 +1,14 @@
+{
+  "name": "synctalk",
+  "version": "1.0.0",
+  "description": "SyncTalk-chatapp \r ## Features",
+  "main": "index.js",
+  "scripts": {
+    "start": "cd backend && node server.js",
+    "server": "cd backend && nodemon server.js",
+    "build": "cd frontend && npm run build && cd .."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
