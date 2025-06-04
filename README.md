@@ -3,10 +3,10 @@
 SyncTalk-chatapp 
 ## Features
 
-- **Send Text Messages
-- **Share Images
-- **Update Profile
-- **User Authentication
+- **Send Text Messages 💬
+- **Share Images 📂
+- **Update Profile  👨🏻‍🦱
+- **User Authentication  🔑
 
 
 ### Installation
@@ -17,31 +17,32 @@ SyncTalk-chatapp
    cd synctalk
    ```
 
-2. Install dependencies:
+2. Install dependencies for frontend and backend
    ```bash
-   npm install
+   cd frontend npm install
+   cd backend  npm install
    # or
    yarn install
    ```
 
 3. Set up environment variables:
- MONGO_URI
+```
+MONGO_URI
 JWT_SECRET
 CLOUDINARY_CLOUD_NAME
 CLOUDINARY_API_KEY
 CLOUDINARY_API_SECRET
 VITE_API_URL
+ ```
 
 4. Start the development server:
-   backend
-   ```
-   npm run server
-   ```
+   for backend
+  ```cd backend npm run server```
 
-frontend
-   ```
-   npm run dev
-   ```
+
+5. Start the development server for frontend
+ ```cd frontend npm run dev```
+
 
 ## Usage
 
