@@ -17,33 +17,35 @@ jobs:
         with:
           node-version: 20.17.0
 
-      # Install and build frontend
+      # Install & Build Frontend (Vite)
       - name: Install frontend dependencies
         run: |
           cd frontend
           npm ci
 
-      - name: Build frontend
+      - name: Build frontend (Vite)
         run: |
           cd frontend
           npm run build
 
-        #Copy build to backend/
+      # Verify build output
+      - name: List frontend/dist contents
+        run: ls -la frontend/dist
+
+      # Copy Vite's dist to backend/public
       - name: Copy frontend build to backend
         run: |
-          rm -rf backend/public
-          cp -r frontend/dist backend/public
+          mkdir -p backend/public
+          cp -r frontend/dist/* backend/public/
+          ls -la backend/public  # Verify copied files
 
-      # Install backend dependencies
+      # Install Backend Dependencies
       - name: Install backend dependencies
         run: |
           cd backend
           npm ci
 
-      - name: List backend/public contents
-        run: ls -l backend/public
-
-      #  Deploy step
+      # Deploy to Render
       - name: Deploy to production
         uses: johnbeynon/render-deploy-action@v0.0.8
         with:
