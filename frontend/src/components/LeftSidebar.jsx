@@ -21,7 +21,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await API.get("/users/");
+        const res = await API.get("/users");
         setUsers(res.data);
       } catch (err) {
         console.error("Error fetching users:", err);
