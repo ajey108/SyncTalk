@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 
 import { IoIosSend } from "react-icons/io";
@@ -11,12 +11,15 @@ import API from "../api/axiosInstance";
 import cloudinaryAPI from "../api/cloudinaryInstance";
 import { useAuth } from "../context/AuthContext";
 
-const socket = io("https://synctalk-backend.onrender.com", {
-  transports: ["websocket", "polling"],
-  withCredentials: true,
-  secure: true, // Force HTTPS
-  autoConnect: false, // Wait until auth is ready
-});
+const socket = io(
+  import.meta.env.VITE_SOCKET_URL || "https://synctalk-backend.onrender.com",
+  {
+    transports: ["websocket", "polling"],
+    withCredentials: true,
+    secure: true,
+    autoConnect: false,
+  }
+);
 
 const ChatBox = ({
   selectedUser,
@@ -26,6 +29,7 @@ const ChatBox = ({
   setMessages,
 }) => {
   const { user } = useAuth();
+  const socketRef = useRef(socket);
 
   const [messageText, setMessageText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
@@ -41,11 +45,16 @@ const ChatBox = ({
   notificationSound.load();
 
   useEffect(() => {
-    if (user?._id) {
-      //If user exists and has a valid _id, join their room
-      socket.emit("join", user._id);
-      console.log(`User ${user._id} joined their room`);
+    if (user?._id && socketRef.current) {
+      socketRef.current.connect();
+      socketRef.current.on("connect", () => {
+        socketRef.current.emit("join", user._id);
+        console.log(`User ${user._id} joined their room`);
+      });
     }
+    return () => {
+      socketRef.current?.off("connect");
+    };
   }, [user]);
 
   useEffect(() => {

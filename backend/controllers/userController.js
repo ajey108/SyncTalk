@@ -1,6 +1,5 @@
 import User from "../models/user.js";
 import cloudinary from "../config/cloudinary.js";
-import multer from "multer";
 
 // Get All Users for Sidebar (Excluding Logged-in User)
 export const getUsers = async (req, res) => {
@@ -46,52 +45,43 @@ export const getCurrentUser = async (req, res) => {
   }
 };
 
-// Configure multer to store file in memory
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
 // Update Profile (Profile Pic, Name, Status)
 export const updateProfile = async (req, res) => {
   try {
-    upload.single("profilePic")(req, res, async (err) => {
-      if (err) return res.status(500).json({ error: err.message });
+    const userFromDB = await User.findById(req.user.id); // or req.user._id
+    let imageUrl = userFromDB?.profilePic || "";
+    const { username, status } = req.body;
 
-      const { username, status } = req.body;
-      let imageUrl = req.user.profilePic;
-
-      if (req.file) {
-        try {
-          const base64Image = `data:${
-            req.file.mimetype
-          };base64,${req.file.buffer.toString("base64")}`;
-
-          const result = await cloudinary.uploader.upload(base64Image, {
-            upload_preset: "chat_sync",
-            unsigned: true,
-          });
-
-          imageUrl = result.secure_url;
-        } catch (uploadError) {
-          console.error("Cloudinary Upload Error:", uploadError);
-          return res.status(500).json({
-            error: "Image upload failed",
-            details: uploadError.message,
-          });
-        }
+    if (req.file) {
+      try {
+        const base64Image = `data:${
+          req.file.mimetype
+        };base64,${req.file.buffer.toString("base64")}`;
+        const result = await cloudinary.uploader.upload(base64Image, {
+          upload_preset: "chat_sync",
+          unsigned: true,
+        });
+        imageUrl = result.secure_url;
+      } catch (uploadError) {
+        console.error("Cloudinary Upload Error:", uploadError);
+        return res.status(500).json({
+          error: "Image upload failed",
+          details: uploadError.message,
+        });
       }
+    }
 
-      const updatedUser = await User.findByIdAndUpdate(
-        req.user.id,
-        { username, status, profilePic: imageUrl },
-        { new: true }
-      );
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { username, status, profilePic: imageUrl },
+      { new: true }
+    );
 
-      if (!updatedUser) {
-        return res.status(404).json({ error: "User not found" });
-      }
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-      res.json(updatedUser);
-    });
+    res.json(updatedUser);
   } catch (err) {
     console.error("Error updating profile:", err);
     res.status(500).json({ error: err.message });

@@ -8,7 +8,7 @@ export default function setupSocket(server) {
     "http://localhost:4173",
     "http://localhost:5173",
     "http://localhost:3000",
-    "https://synctalk-frontend.onrender.com",
+    "https://synctalk-backend.onrender.com",
   ];
 
   const io = new Server(server, {

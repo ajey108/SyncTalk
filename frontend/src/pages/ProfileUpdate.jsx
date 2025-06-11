@@ -36,6 +36,8 @@ const ProfileUpdate = () => {
     data.append("status", formData.status);
     if (image) {
       data.append("profilePic", image);
+    } else {
+      toast.error("no image found");
     }
 
     try {
