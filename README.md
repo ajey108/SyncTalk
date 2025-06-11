@@ -1,6 +1,6 @@
 # SyncTalk
 
-SyncTalk-chatapp 
+SyncTalk-chatapp - UnderDevelopment 
 ## Features
 
 - **Send Text Messages 💬
