@@ -36,20 +36,20 @@ const ProfileUpdate = () => {
     data.append("status", formData.status);
     if (image) {
       data.append("profilePic", image);
-    } else {
-      toast.error("no image found");
     }
 
     try {
-      const response = await API.put("/users/update", data);
+      const response = await API.put("/users/update", data, {
+        withCredentials: true,
+      });
       if (response.status === 200) {
         console.log("Updated User from API:", response.data);
         setUser(response.data); // Update user context
         toast.success("Profile updated successfully!");
 
-        // setTimeout(() => {
-        //   window.location.href = "/chat";
-        // }, 600);
+        setTimeout(() => {
+          window.location.href = "/chat";
+        }, 600);
       } else {
         toast.error("Failed to update profile");
       }

@@ -56,7 +56,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
       <div className="p-4 flex justify-between items-center border-b border-green-500">
         <div className="flex items-center gap-2">
           <IoChatboxEllipses className="text-2xl" />
-          <span className="text-lg font-semibold">SYNCTALK💬</span>
+          <span className="text-lg font-semibold">SYNCTALK</span>
         </div>
 
         <div className="relative">

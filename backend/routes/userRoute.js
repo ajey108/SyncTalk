@@ -13,7 +13,12 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.get("/", authMiddleware, getUsers);
-router.put("/update", authMiddleware, UploadStream.single('profilePic') updateProfile);
+router.put(
+  "/update",
+  authMiddleware,
+  upload.single("profilePic"),
+  updateProfile
+);
 router.get("/me", authMiddleware, getCurrentUser);
 
 export default router;

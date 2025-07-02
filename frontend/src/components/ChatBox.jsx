@@ -152,7 +152,7 @@ const ChatBox = ({
   };
 
   return (
-    <div className="flex w-full h-full overflow-x-hidden overflow-y-hidden md:overflow-y-auto border-2 border-white">
+    <div className="flex w-full h-full overflow-x-hidden overflow-y-auto scrollbar-hide md:overflow-y-auto border-2 border-white">
       {/* Check if a user is selected */}
       {!selectedUser ? (
         <div className="flex flex-col items-center justify-center text-white flex-1 bg-zinc-900 text-center">

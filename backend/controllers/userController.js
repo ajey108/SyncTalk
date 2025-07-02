@@ -47,9 +47,11 @@ export const getCurrentUser = async (req, res) => {
 
 // Update Profile (Profile Pic, Name, Status)
 export const updateProfile = async (req, res) => {
+  console.log("req.file:", req.file);
   try {
     const userFromDB = await User.findById(req.user.id); // or req.user._id
     let imageUrl = userFromDB?.profilePic || "";
+    console.log("imageUrl:", imageUrl);
     const { username, status } = req.body;
 
     if (req.file) {

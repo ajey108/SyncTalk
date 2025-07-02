@@ -47,7 +47,9 @@ app.use(
 );
 
 app.use(cookieParser());
+app.use("/api/users", userRoute);
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the "public" directory
 
@@ -64,8 +66,8 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/auth", authRoutes);
+
 app.use("/api/messages", messageRoute);
-app.use("/api/users", userRoute);
 
 // Handle SPA fallback
 app.get("*", (req, res) => {
