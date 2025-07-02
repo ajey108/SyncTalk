@@ -1,6 +1,10 @@
 # SyncTalk
 
-SyncTalk-chatapp - UnderDevelopment 
+SyncTalk-chatapp.
+
+![SyncTalk-UI](https://github.com/user-attachments/assets/3251a480-a053-4f8c-bf76-c64a8111410a)
+
+
 ## Features
 
 - **Send Text Messages 💬
@@ -8,6 +12,10 @@ SyncTalk-chatapp - UnderDevelopment
 - **Update Profile  👨🏻‍🦱
 - **User Authentication  🔑
 
+##Upcoming features
+-**Istyping
+-**seen Unseen
+-**Group chat
 
 ### Installation
 
@@ -50,6 +58,10 @@ VITE_API_URL
 - **Update Profile:** Go to your profile section to update your display name, avatar, or other details.
 - **Chat:** Select a contact to start chatting. Send text or images using the chat interface.
 - **Logout:** Log out securely when you’re done.
+
+
+## MobileView
+![synctalkMobileView](https://github.com/user-attachments/assets/3a11addd-8df5-4d6f-9441-b5431c345735)
 
 ## Contributing
 
