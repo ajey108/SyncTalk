@@ -60,7 +60,7 @@ VITE_API_URL
 - **Logout:** Log out securely when you’re done.
 
 
-##MobileView
+## MobileView
 ![synctalkMobileView](https://github.com/user-attachments/assets/3a11addd-8df5-4d6f-9441-b5431c345735)
 
 ## Contributing
