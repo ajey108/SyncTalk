@@ -115,7 +115,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
               <div>
                 <p className="text-md font-semibold">{user.username}</p>
                 <span className="text-sm text-gray-300">
-                  {user.lastMessage || "Hey there!"}
+                  {user.lastMessage || user.status}
                 </span>
               </div>
             </div>
