@@ -10,7 +10,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
 
-  console.log("users in leftsidebar", users);
+  //console.log("users in leftsidebar", users);
 
   //search users
   const filteredUsers = users.filter((user) =>

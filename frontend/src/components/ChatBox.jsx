@@ -34,11 +34,11 @@ const ChatBox = ({
   const [messageText, setMessageText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
 
-  console.log("selectedUser", selectedUser);
-  console.log("messages in chatbox are", messages);
+  // console.log("selectedUser", selectedUser);
+  // console.log("messages in chatbox are", messages);
 
   const [imagePreview, setImagePreview] = useState(null);
-  console.log("Selected Image:", selectedImage);
+  //console.log("Selected Image:", selectedImage);
 
   // notification sound
   const notificationSound = new Audio("/ios_notification.mp3");
@@ -49,7 +49,7 @@ const ChatBox = ({
       socketRef.current.connect();
       socketRef.current.on("connect", () => {
         socketRef.current.emit("join", user._id);
-        console.log(`User ${user._id} joined their room`);
+        //console.log(`User ${user._id} joined their room`);
       });
     }
     return () => {

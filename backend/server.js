@@ -54,7 +54,7 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from the "public" directory
 
 const publicPath = path.join(__dirname, "public");
-console.log("Serving static files from:", publicPath);
+//console.log("Serving static files from:", publicPath);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));

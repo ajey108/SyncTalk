@@ -15,7 +15,7 @@ const ProfileUpdate = () => {
     status: "",
   });
 
-  console.log("User data:", user);
+  //console.log("User data:", user);
 
   // Handle image selection
   const handleImageChange = (e) => {
@@ -43,7 +43,7 @@ const ProfileUpdate = () => {
         withCredentials: true,
       });
       if (response.status === 200) {
-        console.log("Updated User from API:", response.data);
+        //console.log("Updated User from API:", response.data);
         setUser(response.data); // Update user context
         toast.success("Profile updated successfully!");
 

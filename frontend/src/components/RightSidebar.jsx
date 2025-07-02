@@ -2,7 +2,7 @@ import React from "react";
 import { GoDotFill } from "react-icons/go";
 
 const RightSidebar = ({ selectedUser, messages }) => {
-  console.log("messages from right", messages);
+  //console.log("messages from right", messages);
   if (!selectedUser)
     return (
       <div className="bg-zinc-900 text-white shadow-lg h-full w-[300px] p-6 flex flex-col items-center justify-center">
@@ -19,7 +19,7 @@ const RightSidebar = ({ selectedUser, messages }) => {
     .filter((msg) => msg.image)
     .map((msg) => msg.image); // Extract the image URLs
 
-  console.log("images from sharedMed is", sharedMedia);
+  //console.log("images from sharedMed is", sharedMedia);
 
   return (
     <div className="bg-zinc-900 text-white shadow-lg h-full w-[300px] p-6">

@@ -13,7 +13,7 @@ const Chat = () => {
   const toggleLeftSidebar = () => setLeftSidebarOpen((prev) => !prev);
   const toggleRightSidebar = () => setRightSidebarOpen((prev) => !prev);
 
-  console.log("Messages in Chat.jsx:", messages);
+  //console.log("Messages in Chat.jsx:", messages);
 
   return (
     <div className="w-full h-screen">
