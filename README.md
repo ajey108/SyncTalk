@@ -1,4 +1,6 @@
-# SyncTalk
+# SyncTalk 
+
+🚀 **Live Demo:** [View](https://synctalk-backend.onrender.com/)
 
 SyncTalk-chatapp.
 
