@@ -50,24 +50,28 @@ const Login = () => {
   };
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center flex items-center justify-center px-6"
-      style={{ backgroundImage: "url('/chatcover.png')" }}
-    >
+    <div className="min-h-screen bg-zinc-900 flex items-center justify-center px-6">
       {/* Left Side Icon */}
+
       <div className="hidden md:flex flex-col items-center mr-10">
         <IoLogoWechat className="w-[200px] h-[200px] text-white opacity-90 animate-bounce" />
         <p className="text-white text-2xl font-semibold mt-4">
-          Welcome to ChatApp!
+          Welcome to SyncTalk!
         </p>
+      </div>
+
+      {/* SyncTalk text for mobile only */}
+      <div className="flex md:hidden flex-col items-center mb-8">
+        <IoLogoWechat className="w-[100px] h-[100px] text-white opacity-90 animate-bounce" />
+        <p className="text-white text-xl font-semibold">Welcome to SyncTalk!</p>
       </div>
 
       {/* Login Form */}
       <form
-        className="bg-white p-8 md:p-12 rounded-lg shadow-xl flex flex-col items-center border border-gray-200 w-full max-w-sm"
+        className="text-white p-8 md:p-12 rounded-lg shadow-xl flex flex-col items-center border border-gray-200 w-full max-w-sm"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-bold text-gray-800">{currentState}</h2>
+        <h2 className="text-2xl font-bold ">{currentState}</h2>
 
         {/* Show username field only for sign-up */}
         {currentState === "Sign up" && (
