@@ -1,4 +1,6 @@
-# SyncTalk
+# SyncTalk 
+
+🚀 **Live Demo:** [View](https://synctalk-backend.onrender.com/)
 
 SyncTalk-chatapp.
 
@@ -12,10 +14,10 @@ SyncTalk-chatapp.
 - **Update Profile  👨🏻‍🦱
 - **User Authentication  🔑
 
-##Upcoming features
--**Istyping
--**seen Unseen
--**Group chat
+## Upcoming features
+- **Istyping
+- **seen Unseen
+- **Group chat
 
 ### Installation
 
