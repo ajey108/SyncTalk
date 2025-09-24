@@ -233,7 +233,7 @@ const ChatBox = ({
                 </p>
                 {isTyping && (
                   <p className="text-sm italic text-gray-500">
-                    {selectedUser.username} is typing...
+                    {selectedUser.name} is typing...
                   </p>
                 )}
                 <p className="md:text-lg font-extralight w-[200px] absolute left-0 -bottom-8 bg-gray-700 text-white text-sm px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
