@@ -17,7 +17,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
     user.username.toLowerCase().includes(search.toLowerCase())
   );
 
-  //get users for letfsidebar
+  //get users for leftsidebar
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -51,7 +51,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
   };
 
   return (
-    <div className="bg-zinc-900 text-white border-2  w-[300px] h-screen shadow-lg  overflow-hidden">
+    <div className="bg-zinc-900 text-white border-2  w-[300px] h-screen shadow-lg  overflow-hidden  ">
       {/* Header Section */}
       <div className="p-4 flex justify-between items-center border-b border-green-500">
         <div className="flex items-center gap-2">

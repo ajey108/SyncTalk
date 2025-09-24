@@ -21,6 +21,10 @@ const socket = io(
   }
 );
 
+// notification sound (move outside component to avoid recreation on each render)
+const notificationSound = new Audio("/ios_notification.mp3");
+notificationSound.load();
+
 const ChatBox = ({
   selectedUser,
   toggleLeftSidebar,
@@ -34,15 +38,13 @@ const ChatBox = ({
   const [messageText, setMessageText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
 
+  const [isTyping, setIsTyping] = useState(false);
+
   // console.log("selectedUser", selectedUser);
   // console.log("messages in chatbox are", messages);
 
   const [imagePreview, setImagePreview] = useState(null);
   //console.log("Selected Image:", selectedImage);
-
-  // notification sound
-  const notificationSound = new Audio("/ios_notification.mp3");
-  notificationSound.load();
 
   useEffect(() => {
     if (user?._id && socketRef.current) {
@@ -92,7 +94,48 @@ const ChatBox = ({
     return () => {
       socket.off("receiveMessage", handleNewMessage);
     };
-  }, [selectedUser, user?._id]);
+  }, [selectedUser, setMessages, user?._id]);
+
+  // typing indicator
+  useEffect(() => {
+    if (!user?._id || !selectedUser?._id) return;
+
+    if (messageText.trim() !== "") {
+      socketRef.current.emit("typing", {
+        from: user._id,
+        to: selectedUser._id,
+      });
+    } else {
+      socketRef.current.emit("stopTyping", {
+        from: user._id,
+        to: selectedUser._id,
+      });
+    }
+  }, [messageText, user?._id, selectedUser?._id]);
+
+  // Listen for typing events
+  useEffect(() => {
+    const handleTyping = ({ from }) => {
+      //console.log("from is", from, "selected user is", selectedUser._id);
+      if (from === selectedUser._id) {
+        setIsTyping(true);
+      }
+    };
+
+    const handleStopTyping = ({ from }) => {
+      if (from === selectedUser._id) {
+        setIsTyping(false);
+      }
+    };
+
+    socketRef.current.on("typing", handleTyping);
+    socketRef.current.on("stopTyping", handleStopTyping);
+
+    return () => {
+      socketRef.current.off("typing", handleTyping);
+      socketRef.current.off("stopTyping", handleStopTyping);
+    };
+  }, [selectedUser?._id]);
 
   // Handle image selection and preview
   const handleImageChange = (e) => {
@@ -188,6 +231,11 @@ const ChatBox = ({
                 <p className="text-sm md:text-lg font-semibold">
                   {selectedUser?.username || "User"}
                 </p>
+                {isTyping && (
+                  <p className="text-sm italic text-gray-500">
+                    {selectedUser.name} is typing...
+                  </p>
+                )}
                 <p className="md:text-lg font-extralight w-[200px] absolute left-0 -bottom-8 bg-gray-700 text-white text-sm px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   {selectedUser?.status || "a SyncTalk user"}
                 </p>

@@ -14,8 +14,9 @@ const MessageSchema = new mongoose.Schema(
     },
     text: { type: String },
     image: { type: String },
+    seen: { type: Boolean, default: false },
   },
-  { timestamps: true } // ✅ Correct placement
+  { timestamps: true }
 );
 
 export default mongoose.model("Message", MessageSchema);
