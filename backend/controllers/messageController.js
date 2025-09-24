@@ -1,6 +1,7 @@
 import Message from "../models/messages.js";
 import cloudinary from "../config/cloudinary.js";
 
+//sendMessage
 const sendMessage = async (req, res) => {
   try {
     const { sender, receiver, text, image } = req.body;
@@ -22,6 +23,7 @@ const sendMessage = async (req, res) => {
   }
 };
 
+//getMessages
 const getMessages = async (req, res) => {
   try {
     const { senderId, receiverId } = req.params; // ✅ Extract sender & receiver from params

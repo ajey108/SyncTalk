@@ -59,6 +59,22 @@ export default function setupSocket(server) {
       }
     });
 
+    //  Handle typing event
+    socket.on("typing", ({ from, to }) => {
+      const receiverSocketId = users[to];
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("typing", { from });
+      }
+    });
+
+    //  Handle stop typing event
+    socket.on("stopTyping", ({ from, to }) => {
+      const receiverSocketId = users[to];
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("stopTyping", { from });
+      }
+    });
+
     // Remove user from tracking on disconnect
     socket.on("disconnect", () => {
       const userId = Object.keys(users).find((key) => users[key] === socket.id);
