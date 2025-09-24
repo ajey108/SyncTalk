@@ -17,7 +17,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
     user.username.toLowerCase().includes(search.toLowerCase())
   );
 
-  //get users for letfsidebar
+  //get users for leftsidebar
   useEffect(() => {
     const fetchUsers = async () => {
       try {

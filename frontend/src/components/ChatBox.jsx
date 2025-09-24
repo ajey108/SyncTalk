@@ -21,6 +21,10 @@ const socket = io(
   }
 );
 
+// notification sound (move outside component to avoid recreation on each render)
+const notificationSound = new Audio("/ios_notification.mp3");
+notificationSound.load();
+
 const ChatBox = ({
   selectedUser,
   toggleLeftSidebar,
@@ -41,10 +45,6 @@ const ChatBox = ({
 
   const [imagePreview, setImagePreview] = useState(null);
   //console.log("Selected Image:", selectedImage);
-
-  // notification sound
-  const notificationSound = new Audio("/ios_notification.mp3");
-  notificationSound.load();
 
   useEffect(() => {
     if (user?._id && socketRef.current) {
@@ -94,7 +94,7 @@ const ChatBox = ({
     return () => {
       socket.off("receiveMessage", handleNewMessage);
     };
-  }, [selectedUser, notificationSound, setMessages, user?._id]);
+  }, [selectedUser, setMessages, user?._id]);
 
   // typing indicator
   useEffect(() => {
@@ -116,7 +116,7 @@ const ChatBox = ({
   // Listen for typing events
   useEffect(() => {
     const handleTyping = ({ from }) => {
-      console.log("from is", from, "selected user is", selectedUser._id);
+      //console.log("from is", from, "selected user is", selectedUser._id);
       if (from === selectedUser._id) {
         setIsTyping(true);
       }
@@ -233,7 +233,7 @@ const ChatBox = ({
                 </p>
                 {isTyping && (
                   <p className="text-sm italic text-gray-500">
-                    {selectedUser.name} is typing...
+                    {selectedUser.username} is typing...
                   </p>
                 )}
                 <p className="md:text-lg font-extralight w-[200px] absolute left-0 -bottom-8 bg-gray-700 text-white text-sm px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
