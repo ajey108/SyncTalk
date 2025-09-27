@@ -15,8 +15,8 @@ SyncTalk-chatapp.
 - **User Authentication  🔑
 
 ## Upcoming features
-- **Istyping
-- **seen Unseen
+- **Audio call
+- **video call
 - **Group chat
 
 ### Installation
