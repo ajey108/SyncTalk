@@ -1,5 +1,4 @@
 import React from "react";
-import { GoDotFill } from "react-icons/go";
 
 const RightSidebar = ({ selectedUser, messages }) => {
   //console.log("messages from right", messages);
@@ -22,7 +21,7 @@ const RightSidebar = ({ selectedUser, messages }) => {
   //console.log("images from sharedMed is", sharedMedia);
 
   return (
-    <div className="bg-zinc-900 text-white shadow-lg h-full w-[300px] p-6">
+    <div className="bg-zinc-900 text-white  shadow-lg h-full w-[300px] p-6">
       {/* 🔹 Profile Section */}
       <div className="flex items-center gap-3 mb-4">
         <img
@@ -32,9 +31,6 @@ const RightSidebar = ({ selectedUser, messages }) => {
         />
         <div>
           <h3 className="text-lg font-semibold">{selectedUser.username}</h3>
-          <p className="text-sm text-green-500 flex items-center gap-1">
-            <GoDotFill className="text-green-500" /> Online
-          </p>
         </div>
       </div>
       <p className="text-white mb-4">{selectedUser.status || "hey there"}</p>

@@ -9,7 +9,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "https://avatar.iran.liara.run/public",
     },
-    status: { type: String, default: "Hey there! I'm using Chat App" },
+    status: { type: String, default: "Hey there! I'm using  SyncTalk" },
   },
   { timestamps: true }
 );

@@ -7,39 +7,36 @@ import { RxCross2 } from "react-icons/rx";
 const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
 
-  const toggleLeftSidebar = () => setLeftSidebarOpen((prev) => !prev);
   const toggleRightSidebar = () => setRightSidebarOpen((prev) => !prev);
-
-  //console.log("Messages in Chat.jsx:", messages);
 
   return (
     <div className="w-full h-screen">
-      <div className="flex  justify-center w-full h-full">
-        {/* Left Sidebar for desktop  */}
-        <div className="hidden md:block w-[300px]  shadow-lg">
+      <div className="flex justify-center w-full h-full">
+        {/* Left Sidebar for desktop */}
+        <div className="hidden md:block w-[300px] shadow-lg">
           <LeftSidebar setSelectedUser={setSelectedUser} />
         </div>
 
-        {/* Left Sidebar for mobile */}
-        {isLeftSidebarOpen && (
-          <div className="fixed top-0 left-0 h-full w-[300px] bg-white shadow-lg z-20 md:hidden">
+        {/* Mobile View: show LeftSidebar first, then ChatBox if user selected */}
+        <div className="flex-1 bg-gray-500  h-full flex flex-col md:hidden">
+          {!selectedUser ? (
             <LeftSidebar setSelectedUser={setSelectedUser} />
-            <button
-              className="absolute top-4 right-0 text-white"
-              onClick={toggleLeftSidebar}
-            >
-              <RxCross2 />
-            </button>
-          </div>
-        )}
+          ) : (
+            <ChatBox
+              toggleLeftSidebar={() => setSelectedUser(null)} // go back
+              toggleRightSidebar={toggleRightSidebar}
+              selectedUser={selectedUser}
+              messages={messages}
+              setMessages={setMessages}
+            />
+          )}
+        </div>
 
-        {/* Main Chat Box */}
-        <div className="flex-1 bg-gray-500 h-full flex flex-col">
+        {/* Main ChatBox for desktop */}
+        <div className="flex-1 bg-gray-500 h-full flex-col hidden md:flex">
           <ChatBox
-            toggleLeftSidebar={toggleLeftSidebar}
             toggleRightSidebar={toggleRightSidebar}
             selectedUser={selectedUser}
             messages={messages}
@@ -47,7 +44,7 @@ const Chat = () => {
           />
         </div>
 
-        {/* Right Sidebar for desktop  */}
+        {/* Right Sidebar for desktop */}
         <div className="hidden md:block w-[300px] bg-white shadow-lg relative">
           <RightSidebar
             onClose={toggleRightSidebar}
@@ -61,14 +58,14 @@ const Chat = () => {
           <div className="fixed top-0 right-0 h-full w-[300px] bg-white shadow-lg z-20 md:hidden">
             <RightSidebar
               onClose={toggleRightSidebar}
-              selectedUser={selectedUser} // Pass selectedUser
-              messages={messages} // Pass messages
+              selectedUser={selectedUser}
+              messages={messages}
             />
             <button
               className="absolute top-4 left-4 text-white"
               onClick={toggleRightSidebar}
             >
-              <RxCross2 />
+              <RxCross2 size={15} />
             </button>
           </div>
         )}

@@ -1,29 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
-
+import { GoDotFill } from "react-icons/go";
 import { IoIosSend } from "react-icons/io";
 import { GrGallery } from "react-icons/gr";
-import { IoHelpCircleOutline } from "react-icons/io5";
-import { HiOutlineArrowSmLeft } from "react-icons/hi";
-import { HiOutlineArrowSmRight } from "react-icons/hi";
+
+import { HiOutlineArrowSmLeft, HiOutlineArrowSmRight } from "react-icons/hi";
 
 import API from "../api/axiosInstance";
 import cloudinaryAPI from "../api/cloudinaryInstance";
 import { useAuth } from "../context/AuthContext";
-
-const socket = io(
-  import.meta.env.VITE_SOCKET_URL || "https://synctalk-backend.onrender.com",
-  {
-    transports: ["websocket", "polling"],
-    withCredentials: true,
-    secure: true,
-    autoConnect: false,
-  }
-);
-
-// notification sound (move outside component to avoid recreation on each render)
-const notificationSound = new Audio("/ios_notification.mp3");
-notificationSound.load();
 
 const ChatBox = ({
   selectedUser,
@@ -32,292 +17,406 @@ const ChatBox = ({
   messages,
   setMessages,
 }) => {
-  const { user } = useAuth();
-  const socketRef = useRef(socket);
+  const { user, onlineUsers } = useAuth();
+  const socketRef = useRef(null);
+  const selectedUserRef = useRef(selectedUser);
+  const userRef = useRef(user);
+  const typingTimeoutRef = useRef(null);
 
   const [messageText, setMessageText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
-
+  const [imagePreview, setImagePreview] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
 
-  // console.log("selectedUser", selectedUser);
-  // console.log("messages in chatbox are", messages);
-
-  const [imagePreview, setImagePreview] = useState(null);
-  //console.log("Selected Image:", selectedImage);
+  // keep refs updated
+  useEffect(() => {
+    selectedUserRef.current = selectedUser;
+  }, [selectedUser]);
 
   useEffect(() => {
-    if (user?._id && socketRef.current) {
-      socketRef.current.connect();
-      socketRef.current.on("connect", () => {
-        socketRef.current.emit("join", user._id);
-        //console.log(`User ${user._id} joined their room`);
-      });
-    }
-    return () => {
-      socketRef.current?.off("connect");
-    };
+    userRef.current = user;
   }, [user]);
 
+  // notification sound
+  const playNotificationSound = () => {
+    try {
+      const s = new Audio("/ios_notification.mp3");
+      s.play();
+    } catch (e) {
+      console.log("Notification sound error", e);
+    }
+  };
+
+  // Initialize socket once
+  useEffect(() => {
+    socketRef.current = io(
+      import.meta.env.VITE_SOCKET_URL ||
+        "https://synctalk-backend.onrender.com",
+      {
+        transports: ["websocket", "polling"],
+        withCredentials: true,
+        secure: true,
+        autoConnect: true,
+      }
+    );
+
+    socketRef.current.on("connect_error", (err) => {
+      console.error("Socket connect error:", err?.message || err);
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []);
+
+  // join the user's room
+  useEffect(() => {
+    if (userRef.current?._id && socketRef.current) {
+      socketRef.current.emit("join", userRef.current._id);
+    }
+  }, [user?._id]);
+
+  // Socket event listeners
+  useEffect(() => {
+    if (!socketRef.current) return;
+
+    // Handle incoming messages
+    const handleReceiveMessage = (newMessage) => {
+      // play sound if message is for me
+      if (newMessage.receiver === userRef.current?._id) {
+        playNotificationSound();
+      }
+
+      // Add to messages if it's from or to the selected user
+      const su = selectedUserRef.current;
+      if (!su) return; // no chat open
+
+      if (newMessage.sender === su._id || newMessage.receiver === su._id) {
+        setMessages((prev) => [...prev, newMessage]);
+      }
+
+      // Mark as seen if the chat is open with the sender
+      if (
+        newMessage.sender === su._id &&
+        newMessage.receiver === userRef.current?._id
+      ) {
+        socketRef.current.emit("markAsSeen", {
+          senderId: newMessage.sender,
+          receiverId: newMessage.receiver,
+        });
+      }
+    };
+
+    const handleMessagesSeen = ({ by }) => {
+      // just update seen status for messages sent by me to 'by'
+      setMessages((prev) =>
+        prev.map((msg) =>
+          // seen
+          msg.sender === userRef.current?._id && msg.receiver === by
+            ? { ...msg, seen: true }
+            : msg
+        )
+      );
+    };
+
+    // update delivered status
+    const handleMessageDelivered = ({ messageId }) => {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg._id === messageId ? { ...msg, delivered: true } : msg
+        )
+      );
+    };
+
+    // Typing indicator
+    const handleTyping = ({ from }) => {
+      if (selectedUserRef.current && from === selectedUserRef.current._id) {
+        setIsTyping(true);
+      }
+    };
+
+    // Stop typing indicator
+    const handleStopTyping = ({ from }) => {
+      if (selectedUserRef.current && from === selectedUserRef.current._id) {
+        setIsTyping(false);
+      }
+    };
+
+    // Register event listeners
+    socketRef.current.on("receiveMessage", handleReceiveMessage);
+    socketRef.current.on("messagesSeen", handleMessagesSeen);
+    socketRef.current.on("messageDelivered", handleMessageDelivered);
+    socketRef.current.on("typing", handleTyping);
+    socketRef.current.on("stopTyping", handleStopTyping);
+    socketRef.current.on("getOnlineUsers");
+
+    // Cleanup on unmount
+    return () => {
+      socketRef.current.off("receiveMessage", handleReceiveMessage);
+      socketRef.current.off("messagesSeen", handleMessagesSeen);
+      socketRef.current.off("messageDelivered", handleMessageDelivered);
+      socketRef.current.off("typing", handleTyping);
+      socketRef.current.off("stopTyping", handleStopTyping);
+      socketRef.current.off("getOnlineUsers");
+    };
+  }, []);
+
+  // Fetch messages for the selected chat and mark seen
   useEffect(() => {
     if (!selectedUser || !user?._id) return;
 
-    //fetch messages
     const fetchMessages = async () => {
       try {
         const res = await API.get(`/messages/${user._id}/${selectedUser._id}`);
-        setMessages(res.data);
-      } catch (error) {
-        console.error(
-          "Error fetching messages:",
-          error.response?.data || error.message
-        );
+        setMessages(res.data || []);
+
+        // mark all as seen
+        socketRef.current.emit("markAsSeen", {
+          senderId: selectedUser._id,
+          receiverId: user._id,
+        });
+      } catch (err) {
+        console.error("Fetch messages error", err);
       }
     };
 
     fetchMessages();
+  }, [selectedUser?._id, user?._id, setMessages]);
 
-    //Listen for Incoming Messages
-    const handleNewMessage = (newMessage) => {
-      if (
-        newMessage.sender === selectedUser._id ||
-        newMessage.receiver === selectedUser._id
-      ) {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-        notificationSound.play(); // Play notification sound
-      }
-    };
-
-    socket.on("receiveMessage", handleNewMessage);
-
-    // Clean up function to remove event listener
-    return () => {
-      socket.off("receiveMessage", handleNewMessage);
-    };
-  }, [selectedUser, setMessages, user?._id]);
-
-  // typing indicator
+  // Typing indicator
   useEffect(() => {
-    if (!user?._id || !selectedUser?._id) return;
+    if (!user?._id || !selectedUser?._id || !socketRef.current) return;
 
+    // emit typing event
     if (messageText.trim() !== "") {
       socketRef.current.emit("typing", {
         from: user._id,
         to: selectedUser._id,
       });
+
+      // reset timeout
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        socketRef.current.emit("stopTyping", {
+          from: user._id,
+          to: selectedUser._id,
+        });
+      }, 1500);
     } else {
       socketRef.current.emit("stopTyping", {
         from: user._id,
         to: selectedUser._id,
       });
     }
+
+    // cleanup on unmount or messageText change
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
   }, [messageText, user?._id, selectedUser?._id]);
 
-  // Listen for typing events
-  useEffect(() => {
-    const handleTyping = ({ from }) => {
-      //console.log("from is", from, "selected user is", selectedUser._id);
-      if (from === selectedUser._id) {
-        setIsTyping(true);
-      }
-    };
-
-    const handleStopTyping = ({ from }) => {
-      if (from === selectedUser._id) {
-        setIsTyping(false);
-      }
-    };
-
-    socketRef.current.on("typing", handleTyping);
-    socketRef.current.on("stopTyping", handleStopTyping);
-
-    return () => {
-      socketRef.current.off("typing", handleTyping);
-      socketRef.current.off("stopTyping", handleStopTyping);
-    };
-  }, [selectedUser?._id]);
-
-  // Handle image selection and preview
+  // Image selection
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setSelectedImage(file);
-      setImagePreview(URL.createObjectURL(file)); // Generate preview URL
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
-  // Send message with text and/or image
+  // Send message
   const handleSendMessage = async () => {
     if (!messageText.trim() && !selectedImage) return;
 
     let imageUrl = null;
-
-    // Upload image to Cloudinary
     if (selectedImage) {
-      const formData = new FormData();
-      formData.append("file", selectedImage);
-      formData.append("upload_preset", "chat_sync"); // Cloudinary Upload Preset
-
+      const fd = new FormData();
+      fd.append("file", selectedImage);
+      fd.append("upload_preset", "chat_sync");
       try {
-        const uploadRes = await cloudinaryAPI.post("/image/upload", formData);
-        imageUrl = uploadRes.data.secure_url; // Get image URL
-        console.log("Image uploaded to Cloudinary:", imageUrl);
-      } catch (error) {
-        console.error(
-          "Error uploading image:",
-          error.response?.data || error.message
-        );
-        return; // Stop execution if image upload fails
+        const uploadRes = await cloudinaryAPI.post("/image/upload", fd);
+        imageUrl = uploadRes.data.secure_url;
+      } catch (err) {
+        console.error("Cloudinary upload error", err);
+        return;
       }
     }
 
-    //  send  the image URL and msg
-    const newMessage = {
+    //  local message object until backend responds
+    const tempMessage = {
+      _id: `temp-${Date.now()}`,
       sender: user._id,
       receiver: selectedUser._id,
       text: messageText || "",
-      image: imageUrl, // Only the URL
+      image: imageUrl,
+      seen: false,
+      delivered: false,
+      createdAt: new Date().toISOString(),
     };
 
+    setMessages((prev) => [...prev, tempMessage]);
+
     try {
-      const res = await API.post("/messages/send", newMessage);
-      setMessages((prev) => [...prev, { ...newMessage, ...res.data }]);
-      socket.emit("sendMessage", res.data);
+      const res = await API.post("/messages/send", {
+        sender: user._id,
+        receiver: selectedUser._id,
+        text: messageText || "",
+        image: imageUrl,
+      });
+
+      //  saved message
+      const savedMessage = {
+        ...res.data,
+        seen: res.data.seen || false,
+        delivered: true,
+      };
+
+      // update the temp message in state
+      setMessages((prev) =>
+        prev.map((m) => (m._id === tempMessage._id ? savedMessage : m))
+      );
+
+      // emit to other user
+      socketRef.current.emit("sendMessage", savedMessage);
+
+      // clear input
       setMessageText("");
       setSelectedImage(null);
       setImagePreview(null);
-    } catch (error) {
-      console.error(
-        "Error sending message:",
-        error.response?.data || error.message
-      );
+    } catch (err) {
+      console.error("Error sending message", err);
     }
   };
 
-  return (
-    <div className="flex w-full h-full overflow-x-hidden overflow-y-auto scrollbar-hide md:overflow-y-auto border-2 border-white">
-      {/* Check if a user is selected */}
-      {!selectedUser ? (
-        <div className="flex flex-col items-center justify-center text-white flex-1 bg-zinc-900 text-center">
-          <h1 className="text-2xl md:text-4xl font-bold">
-            Welcome to SyncTalk!
-          </h1>
-          <p className="text-sm md:text-base mt-2  ">
-            Select a user from the sidebar to start chatting.
-          </p>
+  // cleanup typing on unmount
+  useEffect(() => {
+    return () => {
+      if (socketRef.current && user?._id && selectedUser?._id) {
+        socketRef.current.emit("stopTyping", {
+          from: user._id,
+          to: selectedUser._id,
+        });
+      }
+    };
+  }, [selectedUser?._id, user?._id]);
 
-          <div className="flex items-center gap-2 md:hidden">
-            <HiOutlineArrowSmLeft
-              onClick={toggleLeftSidebar}
-              className="cursor-pointer text-white text-xl"
-            />
-            <HiOutlineArrowSmRight
-              onClick={toggleRightSidebar}
-              className="cursor-pointer text-white text-xl"
-            />
+  return (
+    <div className="flex w-full h-full overflow-hidden">
+      {!selectedUser ? (
+        <div className="flex-1 flex items-center justify-center bg-zinc-900 text-white">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold">Welcome to SyncTalk</h2>
+            <p className="mt-2 text-sm">Select a user to start chatting</p>
           </div>
         </div>
       ) : (
-        <div className="flex flex-col bg-gray-400 flex-1">
-          {/* Chat Header */}
-          <div className="flex justify-between items-center p-3 md:p-4 border-b bg-zinc-900 text-white">
-            <div className="flex items-center gap-2 md:gap-3">
+        <div className="flex flex-col flex-1">
+          {/* Header */}
+          <div className="flex items-center justify-between p-3 bg-zinc-900 text-white border-b">
+            <div className="flex items-center gap-3">
               <img
-                className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
                 src={selectedUser?.profilePic || "/default-avatar.png"}
-                alt="User Avatar"
+                alt="avatar"
+                className="w-10 h-10 rounded-full object-cover"
               />
-              <div className="text-xs md:text-base relative group cursor-pointer">
-                <p className="text-sm md:text-lg font-semibold">
+              <div>
+                <div className="font-semibold">
                   {selectedUser?.username || "User"}
-                </p>
-                {isTyping && (
-                  <p className="text-sm italic text-gray-500">
-                    {selectedUser.name} is typing...
-                  </p>
-                )}
-                <p className="md:text-lg font-extralight w-[200px] absolute left-0 -bottom-8 bg-gray-700 text-white text-sm px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  {selectedUser?.status || "a SyncTalk user"}
-                </p>
+                </div>
+                <div className="text-xs text-gray-300">
+                  {isTyping ? (
+                    <span className="italic">typing...</span>
+                  ) : onlineUsers?.includes(selectedUser?._id) ? (
+                    <span className="text-green-400 flex items-center gap-1">
+                      online <GoDotFill className="text-green-400" />
+                    </span>
+                  ) : (
+                    <span className="text-gray-400">offline</span>
+                  )}
+                </div>
               </div>
             </div>
-
-            {/* Toggle buttons visible only on mobile */}
             <div className="flex items-center gap-2 md:hidden">
               <HiOutlineArrowSmLeft
                 onClick={toggleLeftSidebar}
-                className="cursor-pointer text-white text-xl"
+                className="text-white text-xl cursor-pointer"
               />
               <HiOutlineArrowSmRight
                 onClick={toggleRightSidebar}
-                className="cursor-pointer text-white text-xl"
+                className="text-white text-xl cursor-pointer"
               />
-            </div>
-
-            <div className="hidden md:flex items-center gap-2">
-              <IoHelpCircleOutline className="text-xl cursor-pointer text-gray-600 hover:text-gray-900 transition duration-200" />
             </div>
           </div>
 
-          {/* Chat Messages */}
-          <div className="flex-1 p-1 md:p-4 space-y-3 overflow-y-auto bg-zinc-900">
-            {messages.map((msg, index) => (
+          {/* Messages list */}
+          <div className="flex-1 p-3 bg-zinc-900 overflow-y-auto space-y-3">
+            {messages.map((msg) => (
               <div
-                key={index}
+                key={msg._id}
                 className={`flex ${
-                  msg.sender === user._id
-                    ? "justify-end"
-                    : "items-start gap-2 md:gap-3"
+                  msg.sender === user._id ? "justify-end" : "justify-start"
                 }`}
               >
                 {msg.sender !== user._id && (
                   <img
-                    className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover"
                     src={selectedUser?.profilePic || "/default-avatar.png"}
-                    alt="User Avatar"
+                    alt="avatar"
+                    className="w-8 h-8 rounded-full mr-2"
                   />
                 )}
 
                 <div
                   className={`${
                     msg.sender === user._id
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-200 text-gray-800"
-                  } rounded-lg p-2 md:p-3 max-w-[70%] md:max-w-xs shadow-md break-words`}
+                      ? "bg-gray-500 text-white"
+                      : "bg-gray-200 text-gray-900"
+                  } rounded-lg p-2 max-w-[70%]`}
                 >
-                  {msg.text && (
-                    <p className="text-sm md:text-base">{msg.text}</p>
-                  )}
+                  {msg.text && <div className="text-sm">{msg.text}</div>}
                   {msg.image && (
                     <img
                       src={msg.image}
-                      alt="Sent"
-                      className="mt-2 rounded-lg w-full max-w-[180px] md:max-w-xs object-cover"
+                      alt="sent"
+                      className="mt-2 rounded-md w-full max-w-[180px] object-cover"
                     />
                   )}
-                  <div className="text-[10px] md:text-xs mt-1 opacity-75 text-right">
-                    {new Date(msg.createdAt).toLocaleTimeString()}
+
+                  <div className="text-[10px] mt-1 opacity-75 text-right flex items-center gap-1 justify-end">
+                    <span>{new Date(msg.createdAt).toLocaleTimeString()}</span>
+
+                    {msg.sender === user._id &&
+                      (msg.seen ? (
+                        <span className="text-green-300">✓✓</span>
+                      ) : msg.delivered ? (
+                        <span className="text-white">✓✓</span>
+                      ) : (
+                        <span className="text-white">✓</span>
+                      ))}
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Message Input */}
-          <div className="p-2 md:p-4 bg-zinc-900 text-white flex items-center gap-2 md:gap-3">
+          {/* Input area */}
+          <div className="p-3 bg-zinc-900 flex items-center gap-2">
             {imagePreview && (
               <div className="relative">
                 <img
                   src={imagePreview}
-                  alt="Preview"
-                  className="w-12 h-12 md:w-16 md:h-16 rounded-md object-cover"
+                  alt="preview"
+                  className="w-12 h-12 rounded-md object-cover"
                 />
                 <button
                   onClick={() => {
                     setSelectedImage(null);
                     setImagePreview(null);
                   }}
-                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-1 py-0.5 text-xs"
+                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full px-1 text-xs"
                 >
                   ✕
                 </button>
@@ -329,29 +428,25 @@ const ChatBox = ({
               placeholder="Type a message..."
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
-              className="flex-1 border rounded-full px-3 py-1.5 md:px-4 md:py-2 outline-none focus:ring-2 focus:ring-green-400 text-sm md:text-base"
+              className="flex-1 rounded-full px-4 py-2  border-2 text-sm text-white"
             />
 
             <input
               type="file"
               id="image"
-              accept="image/png, image/jpeg"
+              accept="image/*"
               hidden
               onChange={handleImageChange}
             />
-
-            <label
-              htmlFor="image"
-              className="cursor-pointer text-gray-600 hover:text-gray-900 transition duration-200"
-            >
-              <GrGallery className="text-xl md:text-2xl" />
+            <label htmlFor="image" className="cursor-pointer">
+              <GrGallery className="text-white text-xl" />
             </label>
 
             <button
               onClick={handleSendMessage}
-              className="bg-green-500 text-white rounded-full p-2 hover:bg-green-600 transition duration-200"
+              className="bg-green-500 text-white rounded-full p-2"
             >
-              <IoIosSend className="text-xl" />
+              <IoIosSend />
             </button>
           </div>
         </div>

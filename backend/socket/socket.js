@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import Message from "../models/messages.js";
 
 export default function setupSocket(server) {
   console.log("Socket server is being initialized...");
@@ -43,9 +44,10 @@ export default function setupSocket(server) {
       users[userId] = socket.id;
       socket.join(userId);
       console.log(`User ${userId} joined. Updated users list:`, users);
+      io.emit("getOnlineUsers", Object.keys(users));
     });
 
-    // Send message to the correct receiver
+    // Send message
     socket.on("sendMessage", (message) => {
       const receiverSocketId = users[message.receiver];
       console.log(
@@ -59,7 +61,7 @@ export default function setupSocket(server) {
       }
     });
 
-    //  Handle typing event
+    // Typing indicators
     socket.on("typing", ({ from, to }) => {
       const receiverSocketId = users[to];
       if (receiverSocketId) {
@@ -67,7 +69,6 @@ export default function setupSocket(server) {
       }
     });
 
-    //  Handle stop typing event
     socket.on("stopTyping", ({ from, to }) => {
       const receiverSocketId = users[to];
       if (receiverSocketId) {
@@ -75,11 +76,34 @@ export default function setupSocket(server) {
       }
     });
 
-    // Remove user from tracking on disconnect
+    //  Seen/unseen
+    socket.on("markAsSeen", async ({ senderId, receiverId }) => {
+      try {
+        await Message.updateMany(
+          { sender: senderId, receiver: receiverId, seen: false },
+          { $set: { seen: true } }
+        );
+
+        // Notify sender
+        const senderSocketId = users[senderId];
+        if (senderSocketId) {
+          io.to(senderSocketId).emit("messagesSeen", { by: receiverId });
+        }
+
+        console.log(
+          `Messages from ${senderId} to ${receiverId} marked as seen`
+        );
+      } catch (error) {
+        console.error("Error marking messages as seen:", error);
+      }
+    });
+
+    // Disconnect
     socket.on("disconnect", () => {
       const userId = Object.keys(users).find((key) => users[key] === socket.id);
       if (userId) {
         delete users[userId];
+        io.emit("getOnlineUsers", Object.keys(users));
       }
       console.log("User Disconnected:", socket.id);
     });
