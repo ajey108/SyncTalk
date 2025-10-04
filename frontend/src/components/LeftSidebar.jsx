@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 const LeftSidebar = ({ setSelectedUser }) => {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
 
   //console.log("users in leftsidebar", users);
 
@@ -51,7 +52,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
   };
 
   return (
-    <div className="bg-zinc-900 text-white border-2  w-[300px] h-screen shadow-lg  overflow-hidden  ">
+    <div className="bg-zinc-900 text-white border-2  w-full h-screen shadow-lg  overflow-hidden  ">
       {/* Header Section */}
       <div className="p-4 flex justify-between items-center border-b border-green-500">
         <div className="flex items-center gap-2">
@@ -60,27 +61,31 @@ const LeftSidebar = ({ setSelectedUser }) => {
         </div>
 
         <div className="relative">
-          {/* 🔹 Menu Icon */}
+          {/*  Menu Icon */}
           <div className="group">
-            <p className="text-3xl cursor-pointer hover:text-gray-700 transition duration-200">
-              <SlUser />
-            </p>
+            {/*  Dropdown Menu  */}
+            <div className="relative">
+              <button onClick={() => setOpen(!open)} className="px-4 py-2 ">
+                <SlUser className="text-white" />
+              </button>
 
-            {/* 🔹 Dropdown Menu (Visible on Hover) */}
-            <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-              <p
-                onClick={handleProfile}
-                className="px-4 py-2 text-gray-700 hover:bg-green-500 rounded-md cursor-pointer"
-              >
-                Profile
-              </p>
-              <hr className="border-gray-200 my-1" />
-              <p
-                onClick={handleLogout}
-                className="px-4 py-2 text-red-500 hover:bg-red-100 rounded-md cursor-pointer"
-              >
-                Logout
-              </p>
+              {open && (
+                <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg p-2 transition-all duration-300">
+                  <p
+                    onClick={handleProfile}
+                    className="px-4 py-2 text-gray-700 hover:bg-green-500 rounded-md cursor-pointer"
+                  >
+                    Profile
+                  </p>
+                  <hr className="border-gray-200 my-1" />
+                  <p
+                    onClick={handleLogout}
+                    className="px-4 py-2 text-red-500 hover:bg-red-100 rounded-md cursor-pointer"
+                  >
+                    Logout
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -114,6 +119,7 @@ const LeftSidebar = ({ setSelectedUser }) => {
               />
               <div>
                 <p className="text-md font-semibold">{user.username}</p>
+
                 <span className="text-sm text-gray-300">
                   {user.lastMessage || user.status}
                 </span>
