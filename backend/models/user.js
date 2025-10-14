@@ -7,7 +7,8 @@ const UserSchema = new mongoose.Schema(
     password: { type: String, required: true },
     profilePic: {
       type: String,
-      default: "https://avatar.iran.liara.run/public",
+      default:
+        "https://ih1.redbubble.net/image.620662991.9817/bg,f8f8f8-flat,750x,075,f-pad,750x1000,f8f8f8.u6.jpg",
     },
     status: { type: String, default: "Hey there! I'm using  SyncTalk" },
   },

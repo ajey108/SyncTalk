@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { SlUser } from "react-icons/sl";
-
 import { CiSearch } from "react-icons/ci";
 import { IoChatboxEllipses } from "react-icons/io5";
 import API from "../api/axiosInstance";
@@ -11,14 +10,9 @@ const LeftSidebar = ({ setSelectedUser }) => {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
 
-  //console.log("users in leftsidebar", users);
+  console.log("users in leftsidebar", users);
 
-  //search users
-  const filteredUsers = users.filter((user) =>
-    user.username.toLowerCase().includes(search.toLowerCase())
-  );
-
-  //get users for leftsidebar
+  // Get users for leftsidebar
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -31,19 +25,27 @@ const LeftSidebar = ({ setSelectedUser }) => {
 
     fetchUsers();
   }, []);
+  // search filter
+  const filteredUsers = users.filter((user) =>
+    user.username.toLowerCase().includes(search.toLowerCase())
+  );
+  console.log("Filtered users:", filteredUsers);
+  console.log("Rendering LeftSidebar with users:", users.length);
+  console.log("First user:", users[0]);
+  console.log("Last user:", users[users.length - 1]);
 
   //profile
   const handleProfile = () => {
     window.location.href = "/profile";
   };
 
-  //logouot
+  //logout
   const handleLogout = async () => {
     try {
       await API.post("/auth/logout");
       toast.success("Logged out successfully");
       setTimeout(() => {
-        window.location.href = "/"; // Redirect to login page
+        window.location.href = "/";
       }, 800);
     } catch (err) {
       console.error("Error logging out:", err);
@@ -52,82 +54,88 @@ const LeftSidebar = ({ setSelectedUser }) => {
   };
 
   return (
-    <div className="bg-zinc-900 text-white border-2  w-full h-screen shadow-lg  overflow-hidden  ">
-      {/* Header Section */}
-      <div className="p-4 flex justify-between items-center border-b border-green-500">
+    <div className="bg-[#0f0f0f] text-white w-full h-full flex flex-col border-r border-zinc-800">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-zinc-700">
         <div className="flex items-center gap-2">
-          <IoChatboxEllipses className="text-2xl" />
-          <span className="text-lg font-semibold">SYNCTALK</span>
+          <IoChatboxEllipses className="text-green-500 text-2xl" />
+          <span className="text-lg font-semibold tracking-wide">SyncTalk</span>
         </div>
 
         <div className="relative">
-          {/*  Menu Icon */}
-          <div className="group">
-            {/*  Dropdown Menu  */}
-            <div className="relative">
-              <button onClick={() => setOpen(!open)} className="px-4 py-2 ">
-                <SlUser className="text-white" />
-              </button>
+          <button
+            onClick={() => setOpen(!open)}
+            className="p-2 hover:bg-zinc-800 rounded-full transition"
+          >
+            <SlUser className="text-xl text-white" />
+          </button>
 
-              {open && (
-                <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg p-2 transition-all duration-300">
-                  <p
-                    onClick={handleProfile}
-                    className="px-4 py-2 text-gray-700 hover:bg-green-500 rounded-md cursor-pointer"
-                  >
-                    Profile
-                  </p>
-                  <hr className="border-gray-200 my-1" />
-                  <p
-                    onClick={handleLogout}
-                    className="px-4 py-2 text-red-500 hover:bg-red-100 rounded-md cursor-pointer"
-                  >
-                    Logout
-                  </p>
-                </div>
-              )}
+          {open && (
+            <div className="absolute right-0 mt-3 w-44 bg-zinc-900 border border-zinc-700 rounded-xl overflow-hidden shadow-2xl animate-fadeIn z-20">
+              <p
+                onClick={handleProfile}
+                className="px-4 py-2 hover:bg-green-600 transition cursor-pointer"
+              >
+                Profile
+              </p>
+              <hr className="border-zinc-700" />
+              <p
+                onClick={handleLogout}
+                className="px-4 py-2 text-red-500 hover:bg-zinc-800 cursor-pointer"
+              >
+                Logout
+              </p>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="p-3 flex items-center gap-2">
-        <CiSearch className="text-xl text-gray-300" />
+      {/* Search */}
+      <div className="p-3 flex items-center gap-2 bg-zinc-950 border-b border-zinc-800">
+        <CiSearch className="text-xl text-zinc-400" />
         <input
           type="text"
-          placeholder="Search here..."
+          placeholder="Search users..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="bg-transparent border border-gray-400 rounded-md px-3 py-1 text-white w-full focus:outline-none focus:ring-2 focus:ring-white-400"
+          className="bg-transparent border-none text-white placeholder-zinc-500 w-full focus:outline-none"
         />
       </div>
 
-      {/* Chat List */}
-      <div className="p-3 overflow-y-auto h-full">
+      {/* User List */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar px-2 py-3 space-y-1">
         {filteredUsers.length > 0 ? (
           filteredUsers.map((user) => (
             <div
               key={user._id}
-              className="flex items-center gap-3 p-3 rounded-md hover:bg-green-800 cursor-pointer transition duration-200"
-              onClick={() => setSelectedUser(user)} // Set selected user on click
+              onClick={() => setSelectedUser(user)}
+              className="flex items-center gap-3 p-3 rounded-xl hover:bg-green-800/30 cursor-pointer transition-all duration-200 group"
             >
-              <img
-                src={user.profilePic || "/default-avatar.webp"} // Use user's profile picture if available
-                alt={user.username}
-                className="w-10 h-10 rounded-full object-cover"
-              />
-              <div>
-                <p className="text-md font-semibold">{user.username}</p>
+              <div className="relative">
+                <img
+                  src={user.profilePic || "/default-avatar.webp"}
+                  alt={user.username}
+                  className="w-10 h-10 rounded-full object-cover border border-zinc-700 group-hover:border-green-500"
+                />
+                <span
+                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[#0f0f0f] ${
+                    user.online ? "bg-green-500" : "bg-zinc-600"
+                  }`}
+                ></span>
+              </div>
 
-                <span className="text-sm text-gray-300">
-                  {user.lastMessage || user.status}
+              <div className="flex flex-col">
+                <p className="font-medium">{user.username}</p>
+                <span className="text-sm text-zinc-400 truncate max-w-[180px]">
+                  {user.lastMessage || "Hey there! I'm using SyncTalk"}
                 </span>
               </div>
             </div>
           ))
         ) : (
-          <p className="text-center text-gray-300">No users found.</p> // Show message if no users
+          <div className="text-center text-zinc-400 py-6">
+            {search ? `No users found for "${search}"` : "No users available"}
+          </div>
         )}
       </div>
     </div>

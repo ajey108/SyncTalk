@@ -305,118 +305,133 @@ const ChatBox = ({
   }, [selectedUser?._id, user?._id]);
 
   return (
-    <div className="flex w-full h-full overflow-hidden">
+    <div className="flex flex-col w-full h-full bg-zinc-950 text-white">
       {!selectedUser ? (
-        <div className="flex-1 flex items-center justify-center bg-zinc-900 text-white">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold">Welcome to SyncTalk</h2>
-            <p className="mt-2 text-sm">Select a user to start chatting</p>
-          </div>
+        //  Empty state
+        <div className="flex-1 flex flex-col items-center justify-center text-center text-zinc-400">
+          <h2 className="text-2xl font-bold text-white">
+            Welcome to SyncTalk 👋
+          </h2>
+          <p className="mt-2 text-sm text-zinc-400">
+            Select a user to start chatting
+          </p>
         </div>
       ) : (
-        <div className="flex flex-col flex-1">
-          {/* Header */}
-          <div className="flex items-center justify-between p-3 bg-zinc-900 text-white border-b">
+        <>
+          {/*  Header */}
+          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 border-b border-zinc-800 shadow-md">
             <div className="flex items-center gap-3">
               <img
                 src={selectedUser?.profilePic || "/default-avatar.png"}
                 alt="avatar"
-                className="w-10 h-10 rounded-full object-cover"
+                className="w-10 h-10 rounded-full object-cover border border-zinc-700"
               />
               <div>
-                <div className="font-semibold">
+                <h3 className="font-semibold text-white">
                   {selectedUser?.username || "User"}
-                </div>
-                <div className="text-xs text-gray-300">
+                </h3>
+                <div className="text-xs text-gray-400">
                   {isTyping ? (
-                    <span className="italic">typing...</span>
+                    <span className="italic text-green-400">typing...</span>
                   ) : onlineUsers?.includes(selectedUser?._id) ? (
                     <span className="text-green-400 flex items-center gap-1">
-                      online <GoDotFill className="text-green-400" />
+                      online{" "}
+                      <GoDotFill className="text-green-400 text-[10px]" />
                     </span>
                   ) : (
-                    <span className="text-gray-400">offline</span>
+                    <span className="text-gray-500">offline</span>
                   )}
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 md:hidden">
+
+            <div className="flex items-center gap-3 md:hidden">
               <HiOutlineArrowSmLeft
                 onClick={toggleLeftSidebar}
-                className="text-white text-xl cursor-pointer"
+                className="text-xl cursor-pointer hover:text-green-400 transition"
               />
               <HiOutlineArrowSmRight
                 onClick={toggleRightSidebar}
-                className="text-white text-xl cursor-pointer"
+                className="text-xl cursor-pointer hover:text-green-400 transition"
               />
             </div>
           </div>
 
-          {/* Messages list */}
-          <div className="flex-1 p-3 bg-zinc-900 overflow-y-auto space-y-3">
-            {messages.map((msg) => (
-              <div
-                key={msg._id}
-                className={`flex ${
-                  msg.sender === user._id ? "justify-end" : "justify-start"
-                }`}
-              >
-                {msg.sender !== user._id && (
-                  <img
-                    src={selectedUser?.profilePic || "/default-avatar.png"}
-                    alt="avatar"
-                    className="w-8 h-8 rounded-full mr-2"
-                  />
-                )}
-
+          {/*  Messages area */}
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 bg-zinc-900/90 custom-scrollbar">
+            {messages.length > 0 ? (
+              messages.map((msg) => (
                 <div
-                  className={`${
-                    msg.sender === user._id
-                      ? "bg-gray-500 text-white"
-                      : "bg-gray-200 text-gray-900"
-                  } rounded-lg p-2 max-w-[70%]`}
+                  key={msg._id}
+                  className={`flex items-end gap-2 ${
+                    msg.sender === user._id ? "justify-end" : "justify-start"
+                  } animate-fadeIn`}
                 >
-                  {msg.text && <div className="text-sm">{msg.text}</div>}
-                  {msg.image && (
+                  {msg.sender !== user._id && (
                     <img
-                      src={msg.image}
-                      alt="sent"
-                      className="mt-2 rounded-md w-full max-w-[180px] object-cover"
+                      src={selectedUser?.profilePic || "/default-avatar.png"}
+                      alt="avatar"
+                      className="w-8 h-8 rounded-full border border-zinc-700"
                     />
                   )}
 
-                  <div className="text-[10px] mt-1 opacity-75 text-right flex items-center gap-1 justify-end">
-                    <span>{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                  <div
+                    className={`p-3 rounded-2xl max-w-[75%] shadow-md ${
+                      msg.sender === user._id
+                        ? "bg-green-600 text-white rounded-br-none"
+                        : "bg-zinc-800 text-zinc-200 rounded-bl-none"
+                    }`}
+                  >
+                    {msg.text && (
+                      <p className="text-sm leading-snug">{msg.text}</p>
+                    )}
+                    {msg.image && (
+                      <img
+                        src={msg.image}
+                        alt="sent"
+                        className="mt-2 rounded-md w-full max-w-[200px] object-cover"
+                      />
+                    )}
 
-                    {msg.sender === user._id &&
-                      (msg.seen ? (
-                        <span className="text-green-300">✓✓</span>
-                      ) : msg.delivered ? (
-                        <span className="text-white">✓✓</span>
-                      ) : (
-                        <span className="text-white">✓</span>
-                      ))}
+                    <div className="text-[10px] mt-1 text-right opacity-70 flex items-center justify-end gap-1">
+                      <span>
+                        {new Date(msg.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      {msg.sender === user._id &&
+                        (msg.seen ? (
+                          <span className="text-white">seen</span>
+                        ) : msg.delivered ? (
+                          <span className="text-white">delivered</span>
+                        ) : (
+                          <span className="text-white">sent</span>
+                        ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-center text-zinc-500 mt-10">No messages yet</p>
+            )}
           </div>
 
-          {/* Input area */}
-          <div className="p-3 bg-zinc-900 flex items-center gap-2">
+          {/*  Input area */}
+          <div className="p-3 bg-zinc-950 border-t border-zinc-800 flex items-center gap-3 sticky bottom-0">
             {imagePreview && (
               <div className="relative">
                 <img
                   src={imagePreview}
                   alt="preview"
-                  className="w-12 h-12 rounded-md object-cover"
+                  className="w-12 h-12 rounded-md object-cover border border-zinc-700"
                 />
                 <button
                   onClick={() => {
                     setSelectedImage(null);
                     setImagePreview(null);
                   }}
-                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full px-1 text-xs"
+                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full px-1 text-xs hover:bg-red-600"
                 >
                   ✕
                 </button>
@@ -428,7 +443,7 @@ const ChatBox = ({
               placeholder="Type a message..."
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
-              className="flex-1 rounded-full px-4 py-2  border-2 text-sm text-white"
+              className="flex-1 rounded-full bg-zinc-800 border border-zinc-700 px-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-green-400 transition"
             />
 
             <input
@@ -438,18 +453,21 @@ const ChatBox = ({
               hidden
               onChange={handleImageChange}
             />
-            <label htmlFor="image" className="cursor-pointer">
+            <label
+              htmlFor="image"
+              className="cursor-pointer hover:scale-110 transition"
+            >
               <GrGallery className="text-white text-xl" />
             </label>
 
             <button
               onClick={handleSendMessage}
-              className="bg-green-500 text-white rounded-full p-2"
+              className="bg-green-500 hover:bg-green-600 text-white rounded-full p-2 transition"
             >
-              <IoIosSend />
+              <IoIosSend size={20} />
             </button>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
