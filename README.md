@@ -13,6 +13,10 @@ SyncTalk-chatapp.
 - **Share Images 📂
 - **Update Profile  👨🏻‍🦱
 - **User Authentication  🔑
+- **Typing Indicator
+- **Online offline status
+- **Seen Unseen
+  
 
 ## Upcoming features
 - **Audio call
