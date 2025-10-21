@@ -443,6 +443,12 @@ const ChatBox = ({
               placeholder="Type a message..."
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault(); // prevent newline or form submission
+                  handleSendMessage();
+                }
+              }}
               className="flex-1 rounded-full bg-zinc-800 border border-zinc-700 px-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-green-400 transition"
             />
 
